@@ -1,0 +1,1280 @@
+{
+  "prerequisites": [
+    {
+      "order": 1,
+      "action": "Clear errors in both ST2.0 and the app"
+    },
+    {
+      "order": 2,
+      "action": "Confirm controller and all device firmware is up to date"
+    },
+    {
+      "order": 3,
+      "action": "Run Test & Detect"
+    },
+    {
+      "order": 4,
+      "action": "Reboot controller from ST2.0"
+    },
+    {
+      "order": 5,
+      "action": "Ensure nothing is currently running on the controller before starting"
+    },
+    {
+      "order": 6,
+      "action": "Advise customer not to start anything on the controller while investigating"
+    }
+  ],
+  "errors": [
+    {
+      "app_error": "Timeout Error",
+      "st2_error_code": "SPRINKLER_COM_ERROR_TIMEOUT",
+      "meaning": "Communication with the IGBus device timed out.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 2,
+          "action": "Verify heads are connected and properly assigned"
+        },
+        {
+          "order": 3,
+          "action": "Reseat head connections if needed"
+        },
+        {
+          "order": 4,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "potentially_fatal"
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_COM_ERROR_READ",
+      "meaning": "The electrical part of communication with the IGBus device was detected to be corrupted on the controller side.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 2,
+          "action": "Inspect cable \u2014 may be a bad cable"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_COM_ERROR_RECEIVE",
+      "meaning": "The logical part of communication with the IGBus device was detected to be corrupted on the controller side (ACK error).",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 2,
+          "action": "Inspect cable \u2014 may be a modified cable at controller or bad cable"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Open Error",
+      "st2_error_code": "DRIVER_ERROR_OPEN",
+      "meaning": "Not enough current was detected on the line.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Check diagnostic results and verify current on line",
+          "detail": "Expect approximately 30 per head"
+        },
+        {
+          "order": 2,
+          "action": "Verify controller terminal connections for that line are secure",
+          "detail": "L1: ig 1\u20138 & C | L2: ig 9\u201316 & C"
+        },
+        {
+          "order": 3,
+          "action": "Systematically isolate the problem device on the line if issue persists"
+        },
+        {
+          "order": 4,
+          "action": "If the issue persists and further testing is needed, we can send out an extra cable for troubleshooting purposes"
+        },
+        {
+          "order": 5,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "Open errors typically mean nothing is detected on the line \u2014 check cabling for disconnects or cut wires"
+        },
+        {
+          "type": "hardware_variant",
+          "text": "C3: L1: i1 & C, L2: i2 & C | C2: L1: ig 1\u20138 & C, L2: ig 9\u201316 & C"
+        }
+      ],
+      "flags": [
+        "potentially_fatal"
+      ]
+    },
+    {
+      "app_error": "Current Error",
+      "st2_error_code": "DRIVER_ERROR_SHORTED",
+      "meaning": "The line was detected by the hardware to be shorted (extremely high current).",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Check ST2.0 logs for any prior errors before this issue",
+          "detail": "Look for Water, Valve, or Rotor errors \u2014 these are likely the root cause"
+        },
+        {
+          "order": 2,
+          "action": "Have customer check for modified cables at the controller"
+        },
+        {
+          "order": 3,
+          "action": "Verify current on line via diagnostic results",
+          "detail": "Expect approximately 30 per head"
+        },
+        {
+          "order": 4,
+          "action": "Systematically isolate the problem device on the line if issue persists"
+        },
+        {
+          "order": 5,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "A prior Water, Valve, or Rotor error in the logs is likely the root cause of this error"
+        }
+      ],
+      "flags": [
+        "potentially_fatal"
+      ]
+    },
+    {
+      "app_error": "Current Error",
+      "st2_error_code": "DRIVER_ERROR_CURRENT",
+      "meaning": "Too much current was detected on the line.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Check ST2.0 logs for any prior errors before this issue",
+          "detail": "Look for Water, Valve, or Rotor errors \u2014 these are likely the root cause"
+        },
+        {
+          "order": 2,
+          "action": "Have customer check for modified cables at the controller"
+        },
+        {
+          "order": 3,
+          "action": "Verify current on line via diagnostic results",
+          "detail": "Expect approximately 30 per head"
+        },
+        {
+          "order": 4,
+          "action": "Systematically isolate the problem device on the line if issue persists"
+        },
+        {
+          "order": 5,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "A prior Water, Valve, or Rotor error in the logs is likely the root cause of this error"
+        }
+      ],
+      "flags": [
+        "potentially_fatal"
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "DRIVER_ERROR_ADC_CONVERT",
+      "meaning": "Failed to measure the current on the line.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Have customer check for modified cables at the controller"
+        },
+        {
+          "order": 2,
+          "action": "Verify current on line via diagnostic results",
+          "detail": "Expect approximately 30 per head"
+        },
+        {
+          "order": 3,
+          "action": "Systematically isolate the problem device on the line if issue persists"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "DRIVER_ERROR_DRIVER",
+      "meaning": "The controller was not able to talk to the driver chips used for IGBus communication.",
+      "escalate": true,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Escalate to engineering"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Rotor Error",
+      "st2_error_code": "DRIVER_ERROR_MOTOR_TIMEOUT",
+      "meaning": "A timeout occurred when waiting for a motor movement to complete. This is usually aliased to another error.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Listen for audible clicking or humming \u2014 if present, the head has failed and should be replaced"
+        },
+        {
+          "order": 2,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 3,
+          "action": "Follow leads if other errors are discovered during investigation"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Rotor Error",
+      "st2_error_code": "SPRINKLER_ERROR_NOZZLE_HOME_SPRINKLER",
+      "meaning": "The sprinkler claims to have a rotor error (probably real).",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Listen for audible clicking or humming \u2014 if present, the head has failed and should be replaced"
+        },
+        {
+          "order": 2,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 3,
+          "action": "Test different mapping points and have customer confirm nozzle turns to verify rotor functionality"
+        },
+        {
+          "order": 4,
+          "action": "If issue only occurs in quick-run or schedules, delete and set up the head again"
+        },
+        {
+          "order": 5,
+          "action": "If restoring mapping causes the issue to return, manually re-map the head again"
+        },
+        {
+          "order": 6,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "For S3.13: Manually try to turn the sprinkler while it's performing the homing routine on boot-up. If the sprinkler is NOT making the telltale click that comes with a broken gearbox, it could be failing to home due to a buildup of debris in or on the rotator cap."
+        }
+      ],
+      "flags": [
+        "fatal"
+      ]
+    },
+    {
+      "app_error": "Valve Error",
+      "st2_error_code": "SPRINKLER_ERROR_VALVE_HOME_SPRINKLER",
+      "meaning": "The sprinkler claims to have a valve error (probably real).",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Listen for audible clicking or humming \u2014 if present, the head has failed and should be replaced"
+        },
+        {
+          "order": 2,
+          "action": "If valve is stuck open and water will not stop, replace the head immediately and have customer turn off water until replaced"
+        },
+        {
+          "order": 3,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 4,
+          "action": "Test valve functionality with mapped points"
+        },
+        {
+          "order": 5,
+          "action": "If issue only occurs in quick-run or schedules, delete and set up the head again"
+        },
+        {
+          "order": 6,
+          "action": "If restoring mapping causes the issue to return, manually re-map the head again"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "fatal"
+      ]
+    },
+    {
+      "app_error": "Valve Error",
+      "st2_error_code": "SPRINKLER_ERROR_VALVE_HOME_POS_CHECK",
+      "meaning": "The position reported by the sprinkler did not match expected after valve home operation. Indicates a dropped or early terminated movement. Currently known to appear randomly.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Valve Error",
+      "st2_error_code": "SPRINKLER_ERROR_VALVE_TIMEOUT",
+      "meaning": "The current for the valve motor was never detected to fall. Electrical error usually.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "In the shape editor, move between 2 different points and have someone on-site confirm the head turned"
+        },
+        {
+          "order": 2,
+          "action": "If still reporting the same error when trying to quick-run, replace the head"
+        },
+        {
+          "order": 3,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "fatal"
+      ]
+    },
+    {
+      "app_error": "Valve Error",
+      "st2_error_code": "SPRINKLER_ERROR_VALVE_STEP",
+      "meaning": "The position reported by the sprinkler did not match expected after valve movement operation. Indicates a dropped or early terminated movement. Currently known to appear randomly.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "In the shape editor, move between 2 different points and have someone on-site confirm the head turned"
+        },
+        {
+          "order": 2,
+          "action": "If still reporting the same error when trying to quick-run, replace the head"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Valve Error",
+      "st2_error_code": "SPRINKLER_WORKER_ERROR_VALVE_HOME_RETRY_REQUIRED",
+      "meaning": "Failed to home initially but was eventually able to get the valve closed.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "In the shape editor, move between 2 different points and have someone on-site confirm the head turned"
+        },
+        {
+          "order": 2,
+          "action": "If still reporting the same error when trying to quick-run, replace the head"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_NOZZLE_HOME_POS_CHECK",
+      "meaning": "The position reported by the sprinkler did not match expected after rotor home operation. Indicates a dropped or early terminated movement. Currently known to appear randomly.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        }
+      ],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "For S3.13: Manually try to turn the sprinkler while it's performing the homing routine on boot-up. If the sprinkler is NOT making the telltale click that comes with a broken gearbox, it could be failing to home due to a buildup of debris in or on the rotator cap."
+        }
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_NOZZLE_TIMEOUT",
+      "meaning": "The current for the rotor motor was never detected to fall. Electrical error usually.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Complete normal troubleshooting steps, then discharge the controller overnight"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_NOZZLE_STEP",
+      "meaning": "The position reported by the sprinkler did not match expected after rotor movement operation. Indicates a dropped or early terminated movement. Currently known to appear randomly.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Try adding drop-down points"
+        },
+        {
+          "order": 2,
+          "action": "Escalate to engineering if the issue persists"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_SCAN_FAILURE",
+      "meaning": "The controller failed to scan the head.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Look through the logs \u2014 a previous electrical or water error on that head is likely the cause. If found, the head needs to be replaced"
+        },
+        {
+          "order": 2,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Remove batteries for Controller 2 as well. Overnight recommended"
+        },
+        {
+          "order": 3,
+          "action": "If no previous errors are found, back up the system and delete the head in ST2.0"
+        },
+        {
+          "order": 4,
+          "action": "Perform diagnostics: Scan & Update \u2014 if successful, something was corrupt and the head will need to be recalibrated and remapped"
+        },
+        {
+          "order": 5,
+          "action": "If unsuccessful, escalate to engineering for confirmation \u2014 replacement of the head is likely required",
+          "detail": "Escalate to engineering"
+        },
+        {
+          "order": 6,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "potentially_fatal"
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_UPDATE_FAIL",
+      "meaning": "The controller failed to update the head.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Look through the logs \u2014 a previous electrical or water error on that head is likely the cause. If found, the head needs to be replaced"
+        },
+        {
+          "order": 2,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Remove batteries for Controller 2 as well. Overnight recommended"
+        },
+        {
+          "order": 3,
+          "action": "If no previous errors are found, back up the system and delete the head in ST2.0"
+        },
+        {
+          "order": 4,
+          "action": "Perform diagnostics: Scan & Update \u2014 if successful, something was corrupt and the head will need to be recalibrated and remapped"
+        },
+        {
+          "order": 5,
+          "action": "If unsuccessful, escalate to engineering for confirmation \u2014 replacement of the head is likely required",
+          "detail": "Escalate to engineering"
+        },
+        {
+          "order": 6,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "potentially_fatal"
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_NOT_ENABLED",
+      "meaning": "The controller attempted to use an IGBus device which was not enabled.",
+      "escalate": true,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Escalate to engineering"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Pressure Error",
+      "st2_error_code": "SPRINKLER_ERROR_INVALID_PRESSURE",
+      "meaning": "The pressure from the head was invalid or corrupted.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 2,
+          "action": "Run calibration and make sure expected throw matches forward/backward and that RCO is standard"
+        },
+        {
+          "order": 3,
+          "action": "If throw still accurately tracks mapping, the error can be ignored"
+        },
+        {
+          "order": 4,
+          "action": "If persistent, disable pressure sensor reporting in ST2.0"
+        },
+        {
+          "order": 5,
+          "action": "If calibration fails, disable pressure sensor reporting in ST2.0 and copy calibration from the closest head of the same model"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Pressure Error",
+      "st2_error_code": "SPRINKLER_ERROR_NO_PRESSURE_SENSOR",
+      "meaning": "Tried to use the pressure sensor but none was detected. Often a false positive.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Power cycle the controller long enough to clear cache",
+          "detail": "Overnight recommended with batteries removed from controller"
+        },
+        {
+          "order": 2,
+          "action": "Run calibration and make sure expected throw matches forward/backward and that RCO is standard"
+        },
+        {
+          "order": 3,
+          "action": "If throw still accurately tracks mapping, the error can be ignored"
+        },
+        {
+          "order": 4,
+          "action": "If persistent, disable pressure sensor reporting in ST2.0"
+        },
+        {
+          "order": 5,
+          "action": "If calibration fails, disable pressure sensor reporting in ST2.0 and copy calibration from the closest head of the same model"
+        }
+      ],
+      "notes": [
+        {
+          "type": "version_specific",
+          "text": "Sprinkler versions older than 2.5 (1.52) do not have pressure sensors."
+        }
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_PROBE_RESULTS_INVALID",
+      "meaning": "The controller attempted to use the sprinkler probe results but they were invalid. Should never happen.",
+      "escalate": true,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Escalate to engineering"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_VALVE_NOT_INDEXED",
+      "meaning": "Tried to operate the valve but it was not indexed. Should never happen.",
+      "escalate": true,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Escalate to engineering"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Water Error",
+      "st2_error_code": "SPRINKLER_ERROR_FATAL_LEGACY_ERROR",
+      "meaning": "The device had a fatal error on the sprinkler side. Currently only a water error.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Replace the head"
+        },
+        {
+          "order": 2,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "fatal"
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "SPRINKLER_ERROR_DEVICE_DESC_MISMATCH",
+      "meaning": "The assigned device and actual device types did not match. Requires manual intervention to fix.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Remove devices showing the error and re-add them, with customer help identifying which devices they are"
+        },
+        {
+          "order": 2,
+          "action": "Restore mapping and calibration from backup",
+          "detail": "Backup is automatically created when deleting devices"
+        },
+        {
+          "order": 3,
+          "action": "If backup is corrupt and error returns after re-adding, manually calibrate and re-map from scratch"
+        }
+      ],
+      "notes": [
+        {
+          "type": "efficiency_tip",
+          "text": "Deleting and re-adding devices one at a time generally removes the need for customer assistance in identifying them"
+        }
+      ]
+    },
+    {
+      "app_error": "Controller Offline",
+      "st2_error_code": "CONTROLLER_OFFLINE_C2",
+      "variant": "Controller 2",
+      "meaning": "Controller 2 is not connecting to the network.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Make sure the black antenna on top of the controller box is present and securely fastened"
+        },
+        {
+          "order": 2,
+          "action": "Soft reset the controller by holding the green button for 1 second \u2014 it will attempt to automatically reconnect to the home network"
+        },
+        {
+          "order": 3,
+          "action": "Clear cache: have customer disconnect transformer, remove both batteries on the bottom left corner of the controller board, and let it sit overnight"
+        },
+        {
+          "order": 4,
+          "action": "Reset controller: hold the red button, then hold the green button for 1 second and release it, tap the blue button, wait for the cycling lights to finish, then release red",
+          "detail": "See reference video: Reset_C2.MOV"
+        },
+        {
+          "order": 5,
+          "action": "Delete the network information saved in ST2.0: Controls > System > \"Wipe Network Cache\""
+        },
+        {
+          "order": 6,
+          "action": "Broadcast Bluetooth on the controller: hold the red button for 6 seconds"
+        },
+        {
+          "order": 7,
+          "action": "Have the customer disconnect from the controller in the IrriGreen App: More (bottom right) > \"Disconnect from controller\" (bottom)"
+        },
+        {
+          "order": 8,
+          "action": "Have the customer tap \"Add Controller\" and either scan the QR code or manually enter the controller number and password from the sticker on the controller box"
+        },
+        {
+          "order": 9,
+          "action": "Follow the prompts \u2014 when the app says it's offline and asks to continue with Bluetooth, tap yes and connect to the network using the password on the controller box sticker"
+        },
+        {
+          "order": 10,
+          "action": "Let the controller sync \u2014 when prompted, connect to the desired home network, ensuring it is a 2.4 GHz band"
+        },
+        {
+          "order": 11,
+          "action": "When online, manually update the controller and attached devices through ST2.0 if needed"
+        },
+        {
+          "order": 12,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "Reference video: Reset_C2.MOV \u2014 demonstrates the button sequence for a full controller reset"
+        }
+      ],
+      "videos": [
+        {
+          "filename": "Reset_C2.MOV",
+          "label": "Controller 2 Reset \u2014 Button Sequence"
+        }
+      ],
+      "flags": [
+        "potentially_fatal"
+      ],
+      "branching_flow": {
+        "description": "After steps 1\u20133, attempt network connection (steps 5\u20139), then branch on success.",
+        "linear_steps": [
+          1,
+          2,
+          3
+        ],
+        "then_attempt_steps": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "checkpoint_after_step": 9,
+        "checkpoint": {
+          "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
+          "yes": {
+            "label": "Yes \u2014 connected",
+            "next_steps": [
+              10,
+              11
+            ]
+          },
+          "no": {
+            "label": "No \u2014 could not connect",
+            "action": "Factory reset the controller: first create a backup in ST2.0 via Controls > Backups > Create Backup. Then perform the full reset (step 4): hold the red button, hold the green button for 1 second and release it, tap the blue button, wait for the cycling lights to finish, then release red.",
+            "then_repeat_steps": [
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "then_checkpoint": {
+              "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
+              "yes": {
+                "label": "Yes \u2014 connected",
+                "next_steps": [
+                  10,
+                  11
+                ]
+              },
+              "no": {
+                "label": "No \u2014 still could not connect",
+                "next_steps": [
+                  12
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "app_error": "Controller Offline",
+      "st2_error_code": "CONTROLLER_OFFLINE_C3",
+      "variant": "Controller 3",
+      "meaning": "Controller 3 is not connecting to the network.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Delete the network information saved in ST2.0: Controls > System > \"Wipe Network Cache\""
+        },
+        {
+          "order": 2,
+          "action": "Have the customer disconnect from the controller in the IrriGreen App: More (bottom right) > \"Disconnect from controller\" (bottom)"
+        },
+        {
+          "order": 3,
+          "action": "Press and hold the middle button (WiFi symbol above it) for ~5 seconds \u2014 ensure the digital display reads \"Bluetooth On\"; repeat if it says \"Bluetooth Off\""
+        },
+        {
+          "order": 4,
+          "action": "Tap the leftmost button (hamburger menu above it), scroll with the dial until the display reads \"IG Network\", press the dial to confirm, then press again when display reads \"Confirm\""
+        },
+        {
+          "order": 5,
+          "action": "In their IrriGreen app, have the customer tap \"Add Controller\" and either scan the QR code or manually enter the controller number and password from the sticker on the controller box"
+        },
+        {
+          "order": 6,
+          "action": "Follow the prompts \u2014 when the app says it's offline and asks to continue with Bluetooth, tap yes and connect to the network using the password on the controller box sticker"
+        },
+        {
+          "order": 7,
+          "action": "Let the controller sync \u2014 when prompted, connect to the desired home network, ensuring it is a 2.4 or 5 GHz band"
+        },
+        {
+          "order": 8,
+          "action": "When online, manually update the controller and attached devices through ST2.0 if needed"
+        },
+        {
+          "order": 9,
+          "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
+        }
+      ],
+      "notes": [],
+      "flags": [
+        "potentially_fatal"
+      ],
+      "branching_flow": {
+        "description": "After completing steps 1\u20136, a confirmation branch determines next steps.",
+        "linear_steps": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "checkpoint_after_step": 6,
+        "checkpoint": {
+          "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
+          "yes": {
+            "label": "Yes \u2014 connected",
+            "next_steps": [
+              7,
+              8
+            ]
+          },
+          "no": {
+            "label": "No \u2014 could not connect",
+            "action": "Soft reset the controller: use a flathead screwdriver to remove the topmost black plate in the IrriGreen controller box, then press the small circular reset button for about 1 second",
+            "then_repeat_steps": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "then_checkpoint": {
+              "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
+              "yes": {
+                "label": "Yes \u2014 connected",
+                "next_steps": [
+                  7,
+                  8
+                ]
+              },
+              "no": {
+                "label": "No \u2014 still could not connect",
+                "action": "Factory reset the controller: first create a backup in ST2.0 via Controls > Backups > Create Backup. Then have the customer push in and hold the dial, push in and hold the WiFi button, then push in the reset button for 1 second \u2014 all buttons can then be released. Wait for the controller to come back online.",
+                "then_repeat_steps": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6
+                ],
+                "then_checkpoint": {
+                  "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
+                  "yes": {
+                    "label": "Yes \u2014 connected",
+                    "next_steps": [
+                      7,
+                      8
+                    ]
+                  },
+                  "no": {
+                    "label": "No \u2014 still could not connect",
+                    "next_steps": [
+                      9
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "app_error": "Throw Issue",
+      "st2_error_code": "THROW_SHORT",
+      "variant": "Short",
+      "meaning": "Head is throwing water shorter than mapped, resulting in under-watered areas.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Ensure the starting point is the longest throw of the run and that it does not immediately drop to a closer point"
+        },
+        {
+          "order": 2,
+          "action": "Flush the nozzle",
+          "detail": "Reference: https://support.irrigreen.com/en/sprinkler2/flushing"
+        },
+        {
+          "order": 3,
+          "action": "Flush the riser: while no water is coming out of the head, remove the nozzle and filter inside, then let water bubble out of the head for ~30 seconds by starting shape editor or performing a Quick Run"
+        },
+        {
+          "order": 4,
+          "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
+        },
+        {
+          "order": 5,
+          "action": "If throw is still short, disable AutoWater and redo calibration"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Throw Issue",
+      "st2_error_code": "THROW_LONG",
+      "variant": "Long",
+      "meaning": "Head is throwing water farther than mapped, resulting in over-spray.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Ensure the starting point is the longest throw of the run and that it does not immediately drop to a closer point"
+        },
+        {
+          "order": 2,
+          "action": "Flush the nozzle",
+          "detail": "Reference: https://support.irrigreen.com/en/sprinkler2/flushing"
+        },
+        {
+          "order": 3,
+          "action": "Flush the riser: while no water is coming out of the head, remove the nozzle and filter inside, then let water bubble out of the head for ~30 seconds by starting shape editor or performing a Quick Run"
+        },
+        {
+          "order": 4,
+          "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
+        },
+        {
+          "order": 5,
+          "action": "If throw is still long, disable AutoWater and redo calibration"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Throw Issue",
+      "st2_error_code": "THROW_SAWTOOTHING",
+      "variant": "Sawtoothing",
+      "meaning": "Throw jumps too far or too short, resulting in tracking that resembles a circular saw blade \u2014 highly abnormal pattern.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Ensure the starting point is the longest throw of the run and that it does not immediately drop to a closer point"
+        },
+        {
+          "order": 2,
+          "action": "Add a dropdown point roughly opposite the starting point, with a popup point as close to the dropdown point as possible",
+          "detail": "This gives the valve a chance to re-home and water a chance to repressurize"
+        },
+        {
+          "order": 3,
+          "action": "Flush the nozzle",
+          "detail": "Reference: https://support.irrigreen.com/en/sprinkler2/flushing"
+        },
+        {
+          "order": 4,
+          "action": "Flush the riser: while no water is coming out of the head, remove the nozzle and filter inside, then let water bubble out of the head for ~30 seconds by starting shape editor or performing a Quick Run"
+        },
+        {
+          "order": 5,
+          "action": "If AutoWater is enabled, disable it"
+        },
+        {
+          "order": 6,
+          "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
+        },
+        {
+          "order": 7,
+          "action": "If this head has a history of pressure sensor errors and is generation 2.5 (1.52) or newer, enable the \"Disable Pressure Sensor\" mitigation",
+          "detail": "With pressure sensor disabled, automatic calibration is no longer available. Copy calibration from a nearby head of the same model, or request factory default calibration values from engineering if no other head is available to copy from"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Throw Issue",
+      "st2_error_code": "THROW_SPIRALING",
+      "variant": "Spiraling",
+      "meaning": "Each revolution, the throw gets consistently shorter or longer, resulting in tracking that resembles a spiral.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Ensure the starting point is the longest throw of the run and that it does not immediately drop to a closer point"
+        },
+        {
+          "order": 2,
+          "action": "Add a dropdown point roughly opposite the starting point, with a popup point as close to the dropdown point as possible",
+          "detail": "This gives the valve a chance to re-home and water a chance to repressurize"
+        },
+        {
+          "order": 3,
+          "action": "Flush the nozzle",
+          "detail": "Reference: https://support.irrigreen.com/en/sprinkler2/flushing"
+        },
+        {
+          "order": 4,
+          "action": "Flush the riser: while no water is coming out of the head, remove the nozzle and filter inside, then let water bubble out of the head for ~30 seconds by starting shape editor or performing a Quick Run"
+        },
+        {
+          "order": 5,
+          "action": "If AutoWater is enabled, disable it"
+        },
+        {
+          "order": 6,
+          "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
+        },
+        {
+          "order": 7,
+          "action": "If this head has a history of pressure sensor errors and is generation 2.5 (1.52) or newer, enable the \"Disable Pressure Sensor\" mitigation",
+          "detail": "With pressure sensor disabled, automatic calibration is no longer available. Copy calibration from a nearby head of the same model, or request factory default calibration values from engineering if no other head is available to copy from"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Not Discoverable",
+      "st2_error_code": "DEVICE_NOT_DISCOVERABLE",
+      "variant": null,
+      "meaning": "A sprinkler head or smart valve is not being found during Test & Detect.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Run diagnostics in ST2.0 (Test & Update)"
+        },
+        {
+          "order": 2,
+          "action": "If possible, check the current on a head that was discovered \u2014 expect ~30 per head and smart valve. If current is too low for the number of connected devices, there is a connection issue",
+          "detail": "Walk the customer or contractor through reseating connections and letting them fully dry if moisture is found. Advise engineering a solution to have the connection hang from the top or side of the valve box so it won't sit in pooled water"
+        },
+        {
+          "order": 3,
+          "action": "If current is close to expected and the customer is having trouble adding the device, remote into the app and enable the correct number of valves in More > System Setup \u2014 then try a Quick Run on the new smart valve to confirm it works"
+        },
+        {
+          "order": 4,
+          "action": "If a sprinkler head is still not discoverable, have the customer move it to a location where another head is successfully installed, or run a spare sprinkler cable above ground for testing purposes"
+        }
+      ],
+      "notes": [],
+      "views": [
+        "errors",
+        "installation_service"
+      ]
+    },
+    {
+      "app_error": null,
+      "st2_error_code": "WORKER_ERROR_CANCELLED",
+      "meaning": "The job was manually aborted.",
+      "escalate": false,
+      "steps": [],
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "This code indicates the job was manually cancelled by someone using the IrriGreen app \u2014 not a fault or hardware issue. No troubleshooting required unless cancellation was unintentional."
+        }
+      ]
+    },
+    {
+      "app_error": "Autowater Issue",
+      "st2_error_code": "AUTOWATER_ISSUE",
+      "meaning": "Customer is experiencing unexpected Autowater behavior \u2014 schedules being skipped, too many or too few revolutions, or unexpected watering patterns.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Ask if any third-party rain or soil sensors are connected, and double-check in the logs",
+          "detail": "Third-party rain or soil sensors can overrule the data gathered from Weather Underground, which may explain unexpected Autowater behavior"
+        },
+        {
+          "order": 2,
+          "action": "Explain how Autowater works",
+          "detail": "Autowater pulls weather data from Weather Underground using the address on file for the controller and compares it to the calculated water 'debt' (based on grass type, soil type, and direct sun amount listed for each zone). If the water debt is less than the rainfall reported since the last schedule, OR if sufficient rain is expected within the next 24 hours, the schedule will be skipped and the customer will be notified if notifications are enabled. If the debt is greater than reported rainfall, the schedule will run additional revolutions per head until the debt is balanced. It may be worth asking if the customer would like help enabling notifications."
+        },
+        {
+          "order": 3,
+          "action": "Verify the correct address is listed for the controller in ST2.0: Controls > System > under Salesforce"
+        },
+        {
+          "order": 4,
+          "action": "If the address is incorrect or missing, update it in Salesforce",
+          "detail": "Click 'Open in Salesforce' at the bottom of the Salesforce bubble in ST2.0. Under DeployedatLocationLead, remove the current field and update it with the customer after confirming their address on file is correct. Save changes in Salesforce and refresh ST2.0 to confirm the correct address appears."
+        },
+        {
+          "order": 5,
+          "action": "Ensure correct grass type, soil type, and sun exposure are selected for each zone"
+        },
+        {
+          "order": 6,
+          "action": "If the customer is still unhappy with Autowater performance, explain that Weather Underground data may not be accurate for their region",
+          "detail": "Options to suggest: (1) Invest in a rain sensor for more accurate local precipitation data \u2014 Rain Bird is a good option to recommend. (2) Disable Autowater and manually set the number of revolutions per zone for more direct control \u2014 if they go this route, make sure they understand they'll want to turn off schedules manually when it has rained or is expected to rain before the next schedule."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "Not Receiving Notifications",
+      "st2_error_code": "NOTIFICATIONS_NOT_RECEIVED",
+      "meaning": "Customer is not receiving Autowater skip alerts, error notifications, or other app notifications.",
+      "escalate": false,
+      "steps": [
+        {
+          "order": 1,
+          "action": "Make sure the IrriGreen app is up to date",
+          "detail": "Android: check the Play Store. Apple: check the App Store."
+        },
+        {
+          "order": 2,
+          "action": "Make sure the app is signed into an IrriGreen account"
+        },
+        {
+          "order": 3,
+          "action": "Ensure notifications are enabled for the IrriGreen app in the device's system settings",
+          "detail": "iOS: Settings > Apps > IrriGreen > Notifications. Android: Settings > Apps > IrriGreen > Notifications."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "app_error": "S3 Service Kit Guide",
+      "st2_error_code": "S3_SERVICE_KIT_GUIDE",
+      "meaning": "Step-by-step guide for replacing the riser, spring, filter, and nozzle on a Sprinkler 3 using the service kit.",
+      "escalate": false,
+      "views": [
+        "installation_service"
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "Remove the nozzle by turning the green cap counter-clockwise while holding the riser firmly with the other hand \u2014 once unthreaded it should pull out with little to no resistance"
+        },
+        {
+          "order": 2,
+          "action": "Remove the mesh filter from the base of the riser"
+        },
+        {
+          "order": 3,
+          "action": "Remove the spring from the base of the riser",
+          "detail": "Bend the bottom of a yard flag to create a small hooked tool. Pull the riser up until it rests around the base of the head, then slide the hooked tool down into the riser toward the arm the spring is connected to at the bottom. Use the hook to push the spring hook off the arm, then spin the tool until the spring hook falls out of the riser."
+        },
+        {
+          "order": 4,
+          "action": "Repeat the process to remove the bottom hook of the spring from the arm inside the base of the head"
+        },
+        {
+          "order": 5,
+          "action": "Connect the new spring to the base of the head",
+          "detail": "The new spring may have one hook slightly larger than the other \u2014 that larger side should face down, connecting to the base of the head."
+        },
+        {
+          "order": 6,
+          "action": "Slide in the new riser \u2014 it will only slide in when the grooves are lined up, so rotate the riser if it does not slide in"
+        },
+        {
+          "order": 7,
+          "action": "Connect the new spring to the arm at the bottom of the new riser using the hooked tool"
+        },
+        {
+          "order": 8,
+          "action": "Connect the new cap to the head and screw clockwise until firmly secure"
+        },
+        {
+          "order": 9,
+          "action": "Place the new mesh filter into the riser, making sure it sits flush against the bottom of the riser, right on top of the arm holding the spring"
+        },
+        {
+          "order": 10,
+          "action": "Connect the new nozzle \u2014 it will only slide in when the ports line up with their cutout in the riser, so rotate if needed. Once seated, hold the riser firm with one hand and turn the cap clockwise until tightened with the other."
+        },
+        {
+          "order": 11,
+          "action": "Redo calibration for this head"
+        }
+      ],
+      "notes": [],
+      "flags": []
+    },
+    {
+      "app_error": "Smart Valve Schematic",
+      "st2_error_code": "SMART_VALVE_SCHEMATIC",
+      "meaning": "Installation schematic for the IrriGreen smart valve.",
+      "escalate": false,
+      "views": [
+        "installation_service"
+      ],
+      "flags": [],
+      "steps": [],
+      "notes": [],
+      "schematic": true
+    },
+    {
+      "app_error": "Sprinkler 3 Schematic",
+      "st2_error_code": "SPRINKLER_3_SCHEMATIC",
+      "meaning": "Installation schematic for the IrriGreen Sprinkler 3.",
+      "escalate": false,
+      "views": [
+        "installation_service"
+      ],
+      "flags": [],
+      "steps": [],
+      "notes": [],
+      "schematic": true
+    }
+  ]
+}
