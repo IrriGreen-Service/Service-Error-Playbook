@@ -1,1 +1,2398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Error Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f12;
+    --surface: #141720;
+    --surface2: #1c2030;
+    --border: #252a3a;
+    --border-bright: #2e3550;
+    --accent: #3b82f6;
+    --accent-dim: #1d4ed8;
+    --accent-glow: rgba(59,130,246,0.15);
+    --warn: #f59e0b;
+    --warn-dim: rgba(245,158,11,0.12);
+    --danger: #ef4444;
+    --danger-dim: rgba(239,68,68,0.12);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .logo span { color: var(--text-muted); font-weight: 400; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #file-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── MAIN APP ── */
+  #app-screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 360px;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 12px 8px 34px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #search:focus { border-color: var(--accent); }
+  #search::placeholder { color: var(--text-muted); }
+
+  .filter-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--border-bright); color: var(--text-dim); }
+  .filter-btn.active {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .toolbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #result-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .btn-reset {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: var(--border-bright); color: var(--text-dim); }
+
+  /* ── LAYOUT ── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 56px - 57px); flex: 1;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 300px;
+    min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  .error-list { padding: 8px 0; }
+
+  .error-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .error-item:hover {
+    background: var(--surface2);
+    border-left-color: var(--border-bright);
+  }
+
+  .error-item.active {
+    background: var(--accent-glow);
+    border-left-color: var(--accent);
+  }
+
+  .error-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .app-error-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+  }
+
+  .error-item.active .app-error-label { color: var(--accent); }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .badge-escalate {
+    background: var(--danger-dim);
+    color: var(--danger);
+    border: 1px solid rgba(239,68,68,0.3);
+  }
+
+  .st2-code {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  #detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px 28px;
+  }
+
+  #detail-content::-webkit-scrollbar { width: 4px; }
+  #detail-content::-webkit-scrollbar-track { background: transparent; }
+  #detail-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .empty-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+  .empty-state h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text-dim); }
+  .empty-state p { font-size: 13px; }
+
+  .detail-header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .badge-app {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+
+  .badge-escalate-lg {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--danger-dim);
+    color: var(--danger);
+    border: 1px solid rgba(239,68,68,0.3);
+  }
+
+  .detail-code {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+    word-break: break-all;
+  }
+
+  .detail-meaning {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.65;
+    max-width: 680px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  /* Steps */
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 720px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: border-color 0.15s;
+    cursor: default;
+  }
+
+  .step-item:hover { border-color: var(--border-bright); }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 20px;
+    padding-top: 2px;
+  }
+
+  .step-content { flex: 1; }
+
+  .step-action {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+
+  .step-detail {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 5px;
+    padding: 4px 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    border-left: 2px solid var(--border-bright);
+    line-height: 1.5;
+  }
+
+  .step-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-bright);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.15s;
+    position: relative;
+    background: transparent;
+  }
+
+  .step-check:hover { border-color: var(--green); }
+
+  .step-check.checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .step-check.checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    width: 6px;
+    height: 9px;
+    border: 2px solid #0d0f12;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+
+  .step-item.done {
+    opacity: 0.45;
+  }
+
+  .step-item.done .step-action {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  /* escalate step */
+  .step-item.escalate-step {
+    border-color: rgba(239,68,68,0.25);
+    background: var(--danger-dim);
+  }
+
+  .step-item.escalate-step .step-num { color: var(--danger); }
+
+  /* Notes */
+  .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 720px;
+  }
+
+  .note-item {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+    border: 1px solid;
+  }
+
+  .note-item.diagnostic_hint {
+    background: rgba(59,130,246,0.07);
+    border-color: rgba(59,130,246,0.2);
+    color: #93c5fd;
+  }
+
+  .note-item.version_specific {
+    background: var(--warn-dim);
+    border-color: rgba(245,158,11,0.25);
+    color: #fcd34d;
+  }
+
+  .note-item.hardware_variant {
+    background: rgba(139,92,246,0.08);
+    border-color: rgba(139,92,246,0.2);
+    color: #c4b5fd;
+  }
+
+  .note-item.efficiency_tip {
+    background: var(--green-dim);
+    border-color: rgba(34,197,94,0.2);
+    color: #86efac;
+  }
+
+  .note-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* progress bar */
+  .progress-bar-wrap {
+    max-width: 720px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .progress-bar-wrap.visible { display: block; }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  /* reset progress btn */
+  .btn-reset-progress {
+    margin-top: 12px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-reset-progress:hover { border-color: var(--border-bright); color: var(--text-dim); }
+
+  /* no results */
+  .no-results {
+    padding: 24px 16px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+
+  /* ── SESSION LOG PANEL ── */
+  .session-panel {
+    width: 280px;
+    min-width: 240px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .session-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .session-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .session-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .session-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .session-btn {
+    padding: 4px 9px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .session-btn:hover { border-color: var(--border-bright); color: var(--text-dim); }
+  .session-btn.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .session-btn.reset-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .session-btn.copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  .session-errors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 22px;
+  }
+
+  .session-error-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(59,130,246,0.25);
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .session-empty-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .session-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+
+  .session-body::-webkit-scrollbar { width: 4px; }
+  .session-body::-webkit-scrollbar-track { background: transparent; }
+  .session-body::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  .session-empty-state {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .session-empty-state svg { opacity: 0.25; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+  .session-empty-state p { font-size: 12px; line-height: 1.5; }
+
+  .session-group { padding: 6px 0 2px; }
+
+  .session-group-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 14px 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .session-group-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .session-step-entry {
+    display: flex;
+    gap: 8px;
+    padding: 5px 14px;
+    align-items: flex-start;
+    transition: background 0.1s;
+  }
+
+  .session-step-entry:hover { background: var(--surface2); }
+
+  .session-step-num {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--green);
+    min-width: 16px;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .session-step-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
+
+
+  /* ── PREREQ BANNER (center panel top) ── */
+  #prereq-banner {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 16px 24px 14px;
+    flex-shrink: 0;
+  }
+
+  .prereq-banner-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .prereq-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prereq-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .prereq-row-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    min-width: 16px;
+    padding-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .prereq-row-content { flex: 1; }
+
+  .prereq-row-text {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.4;
+    padding-top: 1px;
+  }
+
+  /* Firmware toggle buttons */
+  .fw-btns {
+    display: flex;
+    gap: 6px;
+    margin-top: 7px;
+    flex-wrap: wrap;
+  }
+
+  .fw-btn {
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid var(--border-bright);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .fw-btn:hover { border-color: var(--border-bright); color: var(--text-dim); }
+
+  .fw-btn.current-ok.active {
+    background: var(--green-dim);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .fw-btn.current-updated.active {
+    background: var(--warn-dim);
+    border-color: var(--warn);
+    color: var(--warn);
+  }
+
+  /* Firmware version inputs */
+  .fw-version-fields {
+    display: none;
+    margin-top: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border-bright);
+    border-radius: 7px;
+    padding: 10px 12px;
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .fw-version-fields.visible { display: flex; }
+
+  .fw-version-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fw-version-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 88px;
+    flex-shrink: 0;
+  }
+
+  .fw-version-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;
+  }
+  .fw-version-input:focus { border-color: var(--accent); }
+  .fw-version-input::placeholder { color: var(--text-muted); }
+
+  .fw-save-btn {
+    margin-top: 2px;
+    padding: 5px 12px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    align-self: flex-end;
+  }
+  .fw-save-btn:hover { background: var(--accent); color: #fff; }
+
+  /* prereq check circle (non-firmware steps) */
+  .prereq-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-bright);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.15s;
+    position: relative;
+    background: transparent;
+  }
+  .prereq-check:hover { border-color: var(--green); }
+  .prereq-check.checked { background: var(--green); border-color: var(--green); }
+  .prereq-check.checked::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 2px;
+    width: 6px; height: 9px;
+    border: 2px solid #0d0f12;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  body.light .prereq-check.checked::after { border-color: #fff; }
+
+
+  /* ── DEVICE SELECTOR ── */
+  .device-selector-section {
+    padding: 14px 24px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .device-selector-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+
+  .device-selector-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .device-selector-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .device-selector-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 52px;
+    flex-shrink: 0;
+  }
+
+  .device-select {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-radius: 6px;
+    padding: 5px 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+  }
+  .device-select:focus { border-color: var(--accent); }
+  .device-select option { background: var(--surface); color: var(--text); }
+
+  .device-text-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-radius: 6px;
+    padding: 5px 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .device-text-input:focus { border-color: var(--accent); }
+  .device-text-input::placeholder { color: var(--text-muted); }
+
+  /* ── SESSION HEADER LINE ── */
+  .session-device-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .session-device-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 24px;
+  }
+
+  .session-device-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+    min-width: 46px;
+  }
+
+  .session-device-value {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .session-device-value.placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .session-device-copy {
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .session-device-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .session-device-copy.copied { border-color: var(--green); color: var(--green); }
+  .session-device-copy:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+
+  /* ── VARIANT BADGE ── */
+  .badge-variant {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: rgba(139,92,246,0.1);
+    color: #a78bfa;
+    border: 1px solid rgba(139,92,246,0.25);
+  }
+
+  .badge-variant-sm {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: rgba(139,92,246,0.08);
+    color: #a78bfa;
+    border: 1px solid rgba(139,92,246,0.2);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  body.light .badge-variant {
+    background: rgba(109,40,217,0.07);
+    color: #6d28d9;
+    border-color: rgba(109,40,217,0.2);
+  }
+  body.light .badge-variant-sm {
+    background: rgba(109,40,217,0.06);
+    color: #6d28d9;
+    border-color: rgba(109,40,217,0.15);
+  }
+
+
+  /* ── SCHEMATIC IMAGE PANEL ── */
+  .schematic-placeholder {
+    max-width: 720px;
+    border: 1.5px dashed var(--border-bright);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .schematic-placeholder:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .schematic-img-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+  }
+
+  .schematic-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .schematic-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 32px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .schematic-empty svg { opacity: 0.3; }
+  .schematic-empty p { font-size: 13px; line-height: 1.5; }
+
+  .schematic-fullscreen-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Fullscreen overlay */
+  .schematic-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.92);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .schematic-overlay.open { display: flex; }
+  .schematic-overlay img {
+    max-width: 96vw;
+    max-height: 94vh;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .schematic-overlay-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.15s;
+  }
+  .schematic-overlay-close:hover { color: #fff; }
+
+  /* ── LIGHT MODE ── */
+  body.light {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #eef1f6;
+    --border: #dde2ec;
+    --border-bright: #c8d0e0;
+    --accent: #2563eb;
+    --accent-dim: #1d4ed8;
+    --accent-glow: rgba(37,99,235,0.1);
+    --warn: #d97706;
+    --warn-dim: rgba(217,119,6,0.1);
+    --danger: #dc2626;
+    --danger-dim: rgba(220,38,38,0.08);
+    --green: #16a34a;
+    --green-dim: rgba(22,163,74,0.1);
+    --text: #111827;
+    --text-muted: #6b7280;
+    --text-dim: #374151;
+  }
+
+  body.light .note-item.diagnostic_hint {
+    background: rgba(37,99,235,0.07);
+    border-color: rgba(37,99,235,0.2);
+    color: #1d4ed8;
+  }
+  body.light .note-item.version_specific {
+    background: rgba(217,119,6,0.08);
+    border-color: rgba(217,119,6,0.25);
+    color: #92400e;
+  }
+  body.light .note-item.hardware_variant {
+    background: rgba(109,40,217,0.07);
+    border-color: rgba(109,40,217,0.2);
+    color: #5b21b6;
+  }
+  body.light .note-item.efficiency_tip {
+    background: rgba(22,163,74,0.08);
+    border-color: rgba(22,163,74,0.2);
+    color: #14532d;
+  }
+  body.light .step-check.checked::after { border-color: #ffffff; }
+
+  /* ── THEME TOGGLE BUTTON ── */
+  .theme-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid var(--border-bright);
+    background: var(--surface2);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .theme-toggle .icon-moon { display: block; }
+  .theme-toggle .icon-sun  { display: none; }
+  body.light .theme-toggle .icon-moon { display: none; }
+  body.light .theme-toggle .icon-sun  { display: block; }
+
+  /* animate in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-header { animation: fadeUp 0.2s ease; }
+  .steps-list { animation: fadeUp 0.25s ease; }
+  .notes-list { animation: fadeUp 0.3s ease; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Service Error<span> / Playbook</span></div>
+  <div class="view-toggle" id="view-toggle">
+    <button class="view-toggle-btn active" data-view="errors">Error Codes</button>
+    <button class="view-toggle-btn" data-view="flags">Flags</button>
+    <button class="view-toggle-btn" data-view="installation_service">Installation &amp; Service</button>
+  </div>
+  <div class="header-right">
+    <span id="file-count"></span>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">
+      <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- APP SCREEN -->
+<div id="app-screen" style="display:flex;flex-direction:column;flex:1;">
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search" placeholder="Search errors, codes, keywords...">
+    </div>
+    <div class="filter-group" id="filter-group">
+      <button class="filter-btn active" data-filter="all">All</button>
+    </div>
+    <div class="toolbar-right">
+      <span id="result-count"></span>
+      <button class="btn-reset" id="reset-filters">Reset</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="error-list" id="error-list"></div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="detail-panel" id="detail-panel">
+      <div id="prereq-banner"></div>
+      <div id="detail-content">
+        <div class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <h3>Select an error to begin</h3>
+          <p>Choose an error from the sidebar to view troubleshooting steps.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SESSION LOG -->
+    <div class="session-panel" id="session-panel">
+      <div class="session-device-header">
+        <div class="session-device-header-inner">
+          <span class="session-device-label">Ticket</span>
+          <span class="session-device-value placeholder" id="session-device-value">No device selected</span>
+          <button class="session-device-copy" id="session-device-copy" disabled title="Copy ticket header">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="session-header">
+        <div class="session-header-top">
+          <span class="session-title">Session Log</span>
+          <div class="session-actions">
+            <button class="session-btn copy-btn" id="session-copy" title="Copy to clipboard">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+            <button class="session-btn reset-btn" id="session-reset" title="Reset session">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+              Reset
+            </button>
+          </div>
+        </div>
+        <div class="session-errors-list" id="session-errors-list">
+          <span class="session-empty-tag">No errors yet</span>
+        </div>
+      </div>
+      <div class="session-body" id="session-body">
+        <div class="session-empty-state">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <p>Completed steps will appear here as you work through an interaction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEMATIC FULLSCREEN OVERLAY -->
+<div class="schematic-overlay" id="schematic-overlay">
+  <button class="schematic-overlay-close" id="schematic-overlay-close">✕ Close</button>
+  <img id="schematic-overlay-img" src="" alt="Schematic fullscreen">
+</div>
+
+<script>
+  // ── THEME ──
+  const body = document.body;
+  if (localStorage.getItem('theme') === 'light') body.classList.add('light');
+
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    body.classList.toggle('light');
+    localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+  });
+
+  let playbook = null;
+  let activeIndex = null;
+  // ── SCHEMATIC PATHS — served directly from repo ──
+  const SCHEMATIC_PATHS = {
+    'SMART_VALVE_SCHEMATIC': 'smart_valve_schematic.png',
+    'SPRINKLER_3_SCHEMATIC': 'sprinkler_3_schematic.png',
+  };
+
+  // ── VIDEO PATHS — served directly from repo ──
+  const VIDEO_PATHS = {
+    'Reset_C2.MOV': 'Reset_C2.MOV',
+  };
+  let checkedSteps = {}; // { errorCode: Set of checked step orders }
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let currentView = 'errors'; // 'errors' | 'flags' | 'installation_service'
+  const FLAG_LABELS = { fatal: 'Fatal', potentially_fatal: 'Potentially Fatal', escalate: 'Escalate' };
+
+  // ── PREREQ / FIRMWARE STATE (declared early to avoid ReferenceError) ──
+  let prereqChecks = {};
+  let firmwareState = null;
+  let firmwareVersions = { from: '', to: '' };
+  let firmwareNoteLogged = false;
+
+  // ── DEVICE SELECTOR STATE ──
+  let deviceState = { type: '', model: '', zone: '' };
+
+  // ── SESSION LOG ──
+  // sessionLog: { [errorCode]: { appError, steps: [{order, action}] } }
+  let sessionLog = {};
+
+  function sessionErrorsCovered() {
+    return Object.keys(sessionLog).filter(code => sessionLog[code].steps.length > 0);
+  }
+
+  function sessionHasFirmwareNote() {
+    return !!sessionLog['__firmware__'];
+  }
+
+  function renderSessionLog() {
+    const errorsList = document.getElementById('session-errors-list');
+    const body = document.getElementById('session-body');
+    const covered = sessionErrorsCovered();
+    const hasFw = sessionHasFirmwareNote();
+
+    // Error tags at top — exclude __firmware__ from tags, show its own pill
+    const errorCodes = covered.filter(c => c !== '__firmware__');
+    if (errorCodes.length === 0 && !hasFw) {
+      errorsList.innerHTML = '<span class="session-empty-tag">No errors yet</span>';
+    } else {
+      const fwTag = hasFw ? `<span class="session-error-tag" style="background:var(--warn-dim);color:var(--warn);border-color:rgba(245,158,11,0.3);" title="Firmware updated">FW Updated</span>` : '';
+      const errTags = errorCodes.map(code => {
+        const label = sessionLog[code].appError || code;
+        return `<span class="session-error-tag" title="${code}">${label}</span>`;
+      }).join('');
+      errorsList.innerHTML = fwTag + errTags;
+    }
+
+    // Steps body
+    if (covered.length === 0) {
+      body.innerHTML = `
+        <div class="session-empty-state">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <p>Completed steps will appear here as you work through an interaction.</p>
+        </div>`;
+      return;
+    }
+
+    // Sort: firmware note first, then error codes
+    const orderedCodes = [
+      ...(hasFw ? ['__firmware__'] : []),
+      ...errorCodes
+    ];
+
+    body.innerHTML = orderedCodes.map(code => {
+      const entry = sessionLog[code];
+      const groupLabel = code === '__firmware__'
+        ? 'Firmware'
+        : (entry.appError ? `${entry.appError} — ${code}` : code);
+      const stepsHtml = entry.steps.map(s =>
+        `<div class="session-step-entry">
+          <span class="session-step-num" style="${code === '__firmware__' ? 'color:var(--warn);' : ''}">→</span>
+          <span class="session-step-text" style="${code === '__firmware__' ? 'color:var(--warn);font-weight:500;' : ''}">${s.action}</span>
+        </div>`
+      ).join('');
+      return `
+        <div class="session-group">
+          <div class="session-group-label">${groupLabel}</div>
+          ${stepsHtml}
+        </div>`;
+    }).join('');
+  }
+
+  function addStepToSession(err, step) {
+    const code = err.st2_error_code;
+    if (!sessionLog[code]) {
+      sessionLog[code] = { appError: err.app_error || null, steps: [] };
+    }
+    if (!sessionLog[code].steps.find(s => s.order === step.order)) {
+      sessionLog[code].steps.push({ order: step.order, action: step.action });
+      sessionLog[code].steps.sort((a, b) => a.order - b.order);
+    }
+    renderSessionLog();
+  }
+
+  function removeStepFromSession(err, stepOrder) {
+    const code = err.st2_error_code;
+    if (!sessionLog[code]) return;
+    sessionLog[code].steps = sessionLog[code].steps.filter(s => s.order !== stepOrder);
+    if (sessionLog[code].steps.length === 0) delete sessionLog[code];
+    renderSessionLog();
+  }
+
+  function buildCopyText() {
+    const covered = sessionErrorsCovered();
+    if (covered.length === 0) return '';
+    const lines = [];
+    lines.push('=== Troubleshooting Session Log ===');
+    lines.push('');
+    const errorCodes = covered.filter(c => c !== '__firmware__');
+    if (errorCodes.length > 0) {
+      lines.push('Errors addressed: ' + errorCodes.map(c => sessionLog[c].appError || c).join(', '));
+    }
+    lines.push('');
+    // firmware note first
+    if (sessionLog['__firmware__']) {
+      lines.push('--- Firmware ---');
+      sessionLog['__firmware__'].steps.forEach(s => lines.push(`  ${s.action}`));
+      lines.push('');
+    }
+    errorCodes.forEach(code => {
+      const entry = sessionLog[code];
+      const label = entry.appError ? `${entry.appError} (${code})` : code;
+      lines.push(`--- ${label} ---`);
+      entry.steps.forEach(s => lines.push(`  ${s.order}. ${s.action}`));
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+
+  document.getElementById('session-copy').addEventListener('click', () => {
+    const text = buildCopyText();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('session-copy');
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+      }, 2000);
+    });
+  });
+
+  document.getElementById('session-reset').addEventListener('click', () => {
+    sessionLog = {};
+    checkedSteps = {};
+    branchState = {};
+    prereqChecks = {};
+    firmwareState = null;
+    firmwareVersions = { from: '', to: '' };
+    firmwareNoteLogged = false;
+    deviceState = { type: '', model: '', zone: '' };
+    renderSessionLog();
+    renderTicketHeader();
+    renderList();
+    renderPrereqs();
+    if (activeIndex !== null && playbook) renderDetail(playbook.errors[activeIndex]);
+  });
+
+  // ── FILE LOADING ──
+  // ── FETCH JSON FROM REPO ──
+  fetch('Service_Error_Playbook.json')
+    .then(r => {
+      if (!r.ok) throw new Error('JSON not found');
+      return r.json();
+    })
+    .then(data => {
+      if (!data.errors || !Array.isArray(data.errors)) throw new Error('Invalid format');
+      playbook = data;
+      initApp();
+    })
+    .catch(err => {
+      console.error('Failed to load playbook:', err);
+      document.getElementById('file-count').textContent = 'Error loading playbook';
+    });
+
+  // ── INIT ──
+  function initApp() {
+    document.getElementById('file-count').textContent = `${playbook.errors.length} errors loaded`;
+
+    // Build dynamic filters based on current view
+    buildFilterButtons();
+
+    renderPrereqs();
+    renderList();
+    renderDetail(null);
+
+    // Wire view toggle
+    document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentView = btn.dataset.view;
+        currentFilter = 'all';
+        document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        buildFilterButtons();
+        renderList();
+      });
+    });
+
+    document.getElementById('filter-group').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    });
+
+    document.getElementById('search').addEventListener('input', e => {
+      currentSearch = e.target.value.toLowerCase();
+      renderList();
+    });
+
+    document.getElementById('reset-filters').addEventListener('click', () => {
+      currentSearch = '';
+      currentFilter = 'all';
+      document.getElementById('search').value = '';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-filter="all"]').classList.add('active');
+      renderList();
+    });
+  }
+
+  // ── BUILD FILTER BUTTONS based on currentView ──
+  function buildFilterButtons() {
+    const filterGroup = document.getElementById('filter-group');
+    filterGroup.innerHTML = '<button class="filter-btn active" data-filter="all">All</button>';
+
+    if (currentView === 'errors' && playbook) {
+      const appErrors = [...new Set(playbook.errors.map(e => e.app_error).filter(Boolean))].sort();
+      appErrors.forEach(ae => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.dataset.filter = ae;
+        btn.textContent = ae;
+        filterGroup.appendChild(btn);
+      });
+    } else if (currentView === 'flags') {
+      const flagDefs = [
+        { value: 'fatal',             label: 'Fatal',             cls: 'flag-fatal' },
+        { value: 'potentially_fatal', label: 'Potentially Fatal', cls: 'flag-potentially-fatal' },
+        { value: 'escalate',          label: 'Escalate',          cls: 'flag-escalate' },
+      ];
+      flagDefs.forEach(({ value, label, cls }) => {
+        const btn = document.createElement('button');
+        btn.className = `filter-btn ${cls}`;
+        btn.dataset.filter = value;
+        btn.textContent = label;
+        filterGroup.appendChild(btn);
+      });
+    } else if (currentView === 'installation_service' && playbook) {
+      // Sub-categories from app_error for installation_service entries
+      const cats = [...new Set(
+        playbook.errors
+          .filter(e => (e.views || ['errors']).includes('installation_service'))
+          .map(e => e.app_error)
+          .filter(Boolean)
+      )].sort();
+      cats.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.dataset.filter = cat;
+        btn.textContent = cat;
+        filterGroup.appendChild(btn);
+      });
+    }
+    // Re-apply currentFilter if it still exists in new set
+    const match = filterGroup.querySelector(`[data-filter="${currentFilter}"]`);
+    if (match) {
+      filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      match.classList.add('active');
+    }
+  }
+
+  const MODEL_OPTIONS = {
+    controller: [
+      { value: 'C2', label: 'Controller 2' },
+      { value: 'C3', label: 'Controller 3' },
+    ],
+    sprinkler: [
+      { value: '2.07',     label: '2.07' },
+      { value: '2.08',     label: '2.08' },
+      { value: '2.09',     label: '2.09' },
+      { value: '2.50',     label: '2.50' },
+      { value: '2.60',     label: '2.60' },
+      { value: '2.60001',  label: '2.60001' },
+      { value: '2.60002',  label: '2.60002' },
+      { value: '2.60003',  label: '2.60003' },
+      { value: '2.60005',  label: '2.60005' },
+      { value: '2.615',    label: '2.615' },
+      { value: '2.62',     label: '2.62' },
+      { value: '3.0',      label: '3.0' },
+      { value: '3.1',      label: '3.1' },
+      { value: '3.2',      label: '3.2' },
+      { value: '3.3',      label: '3.3' },
+      { value: '3.4',      label: '3.4' },
+      { value: '3.5',      label: '3.5' },
+      { value: '3.6',      label: '3.6' },
+      { value: '3.7',      label: '3.7' },
+      { value: '3.8',      label: '3.8' },
+      { value: '3.9',      label: '3.9' },
+      { value: '3.11',     label: '3.11' },
+      { value: '3.12',     label: '3.12' },
+      { value: '3.13',     label: '3.13' },
+    ],
+    valve: [
+      { value: 'smart', label: 'Smart Valve' },
+      { value: 'traditional', label: 'Traditional Valve' },
+    ],
+  };
+
+  function deviceModelRowHtml() {
+    if (!deviceState.type) return '';
+    const opts = MODEL_OPTIONS[deviceState.type] || [];
+    const optsHtml = opts.map(o =>
+      `<option value="${o.value}" ${deviceState.model === o.value ? 'selected' : ''}>${o.label}</option>`
+    ).join('');
+    const label = deviceState.type === 'controller' ? 'Model'
+                : deviceState.type === 'sprinkler'   ? 'Model'
+                : 'Type';
+    return `
+      <div class="device-selector-row">
+        <span class="device-selector-label">${label}</span>
+        <select class="device-select" id="dev-model">
+          <option value="">— Select —</option>
+          ${optsHtml}
+        </select>
+      </div>`;
+  }
+
+  function deviceZoneRowHtml() {
+    // Zone asked for sprinkler and valve, not controller
+    if (deviceState.type !== 'sprinkler' && deviceState.type !== 'valve') return '';
+    // For valve, ask position/number instead of zone
+    if (deviceState.type === 'valve') {
+      return `
+        <div class="device-selector-row">
+          <span class="device-selector-label">Position</span>
+          <input class="device-text-input" id="dev-zone" type="text" placeholder="e.g. 2 (position on line)" value="${deviceState.zone}">
+        </div>`;
+    }
+    return `
+      <div class="device-selector-row">
+        <span class="device-selector-label">Zone</span>
+        <input class="device-text-input" id="dev-zone" type="text" placeholder="e.g. 4, 4-8, 1, 3, 5" value="${deviceState.zone}">
+      </div>`;
+  }
+
+  function buildTicketHeader() {
+    const { type, model, zone } = deviceState;
+    if (!type || !model) return '';
+
+    // Get current app_error and variant from active error
+    const activeErr = (activeIndex !== null && playbook) ? playbook.errors[activeIndex] : null;
+    const errorLabel = activeErr ? (activeErr.app_error || '') : '';
+    const variant = activeErr ? (activeErr.variant || '') : '';
+    // If there's a variant, prefer "Variant ErrorCategory" over just "ErrorCategory"
+    const fullErrorLabel = (variant && errorLabel)
+      ? `${variant} ${errorLabel}`
+      : errorLabel;
+
+    if (type === 'controller') {
+      // e.g. "Controller 3 Offline" → model is 'C2'/'C3', map to friendly
+      const modelLabel = model === 'C2' ? '2' : model === 'C3' ? '3' : model;
+      return `Controller ${modelLabel}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
+    }
+
+    if (type === 'sprinkler') {
+      // e.g. "S3.12 Z4 Timeout Error"
+      const zoneStr = zone ? ` Z${zone}` : '';
+      return `S${model}${zoneStr}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
+    }
+
+    if (type === 'valve') {
+      // e.g. "Smart Valve 2 Pressure Error"
+      const typeLabel = model === 'smart' ? 'Smart Valve' : 'Traditional Valve';
+      const posStr = zone ? ` ${zone}` : '';
+      return `${typeLabel}${posStr}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
+    }
+
+    return '';
+  }
+
+  function renderTicketHeader() {
+    const header = buildTicketHeader();
+    const el = document.getElementById('session-device-value');
+    const copyBtn = document.getElementById('session-device-copy');
+    if (!el) return;
+    if (header) {
+      el.textContent = header;
+      el.classList.remove('placeholder');
+      copyBtn.disabled = false;
+    } else {
+      el.textContent = 'No device selected';
+      el.classList.add('placeholder');
+      copyBtn.disabled = true;
+    }
+  }
+
+  // Maps device type+model value to the variant string used in the JSON
+  const VARIANT_MAP = {
+    controller: { 'C2': 'Controller 2', 'C3': 'Controller 3' },
+    sprinkler:  {},  // no variants on sprinkler entries yet
+    valve:      { 'smart': 'Smart Valve', 'traditional': 'Traditional Valve' },
+  };
+
+  function autoSelectFromDevice() {
+    if (!playbook || !deviceState.type || !deviceState.model) return;
+    const variantLabel = (VARIANT_MAP[deviceState.type] || {})[deviceState.model];
+    if (!variantLabel) return;
+
+    // Find an error that matches the active filter AND the variant
+    const match = playbook.errors.find(err =>
+      err.variant === variantLabel &&
+      (currentFilter === 'all' || err.app_error === currentFilter)
+    );
+    if (!match) return;
+
+    const idx = playbook.errors.indexOf(match);
+    if (idx === activeIndex) return; // already showing it
+    activeIndex = idx;
+    renderList();
+    renderDetail(playbook.errors[activeIndex]);
+  }
+
+  function wireDeviceSelectors() {
+    const typeEl = document.getElementById('dev-type');
+    const modelEl = document.getElementById('dev-model');
+    const zoneEl = document.getElementById('dev-zone');
+
+    if (typeEl) {
+      typeEl.value = deviceState.type;
+      typeEl.addEventListener('change', e => {
+        deviceState.type = e.target.value;
+        deviceState.model = '';
+        deviceState.zone = '';
+        renderPrereqs();
+        renderTicketHeader();
+        autoSelectFromDevice();
+      });
+    }
+    if (modelEl) {
+      modelEl.addEventListener('change', e => {
+        deviceState.model = e.target.value;
+        renderPrereqs();
+        renderTicketHeader();
+        autoSelectFromDevice();
+      });
+    }
+    if (zoneEl) {
+      zoneEl.addEventListener('input', e => {
+        deviceState.zone = e.target.value.trim();
+        renderTicketHeader();
+      });
+    }
+  }
+
+  document.getElementById('session-device-copy').addEventListener('click', () => {
+    const header = buildTicketHeader();
+    if (!header) return;
+    navigator.clipboard.writeText(header).then(() => {
+      const btn = document.getElementById('session-device-copy');
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+      }, 2000);
+    });
+  });
+
+  // ── PREREQS ──
+
+  // Which prereq order contains the firmware check (heuristic: action mentions "firmware")
+  function getFirmwarePrereqOrder() {
+    if (!playbook.prerequisites) return null;
+    const fw = playbook.prerequisites.find(p =>
+      p.action && p.action.toLowerCase().includes('firmware')
+    );
+    return fw ? fw.order : null;
+  }
+
+  function logFirmwareNote() {
+    const { from, to } = firmwareVersions;
+    const noteText = (from && to)
+      ? `Firmware updated: ${from} → ${to}`
+      : 'Firmware needed update (versions not recorded)';
+    // Store under special key __firmware__ in sessionLog
+    sessionLog['__firmware__'] = {
+      appError: 'Prerequisites',
+      steps: [{ order: 0, action: noteText }]
+    };
+    firmwareNoteLogged = true;
+    renderSessionLog();
+  }
+
+  function clearFirmwareNote() {
+    if (sessionLog['__firmware__']) {
+      delete sessionLog['__firmware__'];
+      firmwareNoteLogged = false;
+      renderSessionLog();
+    }
+  }
+
+  function renderPrereqs() {
+    if (!playbook.prerequisites) return;
+    const banner = document.getElementById('prereq-banner');
+    const fwOrder = getFirmwarePrereqOrder();
+
+    const stepsHtml = playbook.prerequisites.map(p => {
+      const isFirmware = p.order === fwOrder;
+
+      if (isFirmware) {
+        const isOk = firmwareState === 'ok';
+        const isUpdated = firmwareState === 'updated';
+        const showFields = isUpdated;
+        return `
+          <div class="prereq-row">
+            <span class="prereq-row-num">${p.order}.</span>
+            <div class="prereq-row-content">
+              <div class="prereq-row-text">${p.action}</div>
+              <div class="fw-btns">
+                <button class="fw-btn current-ok ${isOk ? 'active' : ''}" id="fw-btn-ok">✓ Already up to date</button>
+                <button class="fw-btn current-updated ${isUpdated ? 'active' : ''}" id="fw-btn-updated">↑ Firmware needed update</button>
+              </div>
+              <div class="fw-version-fields ${showFields ? 'visible' : ''}" id="fw-version-fields">
+                <div class="fw-version-row">
+                  <span class="fw-version-label">Previous version</span>
+                  <input class="fw-version-input" id="fw-from" type="text" placeholder="e.g. 2.5.1" value="${firmwareVersions.from}">
+                </div>
+                <div class="fw-version-row">
+                  <span class="fw-version-label">Updated to</span>
+                  <input class="fw-version-input" id="fw-to" type="text" placeholder="e.g. 2.6.2" value="${firmwareVersions.to}">
+                </div>
+                <button class="fw-save-btn" id="fw-save">Save to log</button>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        const checked = prereqChecks[p.order] || false;
+        return `
+          <div class="prereq-row">
+            <span class="prereq-row-num">${p.order}.</span>
+            <div class="prereq-row-content">
+              <div class="prereq-row-text" style="${checked ? 'text-decoration:line-through;opacity:0.5;' : ''}">${p.action}</div>
+            </div>
+            <div class="prereq-check ${checked ? 'checked' : ''}" data-prereq-order="${p.order}"></div>
+          </div>`;
+      }
+    }).join('');
+
+    banner.innerHTML = `
+      <div class="device-selector-section">
+        <div class="device-selector-title">Device</div>
+        <div class="device-selector-rows" id="device-rows">
+          <div class="device-selector-row">
+            <span class="device-selector-label">Type</span>
+            <select class="device-select" id="dev-type">
+              <option value="">— Select —</option>
+              <option value="controller">Controller</option>
+              <option value="sprinkler">Sprinkler Head</option>
+              <option value="valve">Valve</option>
+            </select>
+          </div>
+          ${deviceModelRowHtml()}
+          ${deviceZoneRowHtml()}
+        </div>
+      </div>
+      <div class="prereq-banner-title" style="padding:14px 24px 0;">Before You Begin</div>
+      <div class="prereq-steps" style="padding:8px 24px 14px;">${stepsHtml}</div>
+    `;
+
+    // Wire firmware buttons
+    const btnOk = document.getElementById('fw-btn-ok');
+    const btnUpdated = document.getElementById('fw-btn-updated');
+    if (btnOk) {
+      btnOk.addEventListener('click', () => {
+        firmwareState = firmwareState === 'ok' ? null : 'ok';
+        clearFirmwareNote();
+        renderPrereqs();
+      });
+    }
+    if (btnUpdated) {
+      btnUpdated.addEventListener('click', () => {
+        firmwareState = firmwareState === 'updated' ? null : 'updated';
+        if (firmwareState !== 'updated') clearFirmwareNote();
+        renderPrereqs();
+        if (firmwareState === 'updated') {
+          setTimeout(() => document.getElementById('fw-from')?.focus(), 50);
+        }
+      });
+    }
+
+    // Wire version inputs (live update)
+    const inputFrom = document.getElementById('fw-from');
+    const inputTo = document.getElementById('fw-to');
+    if (inputFrom) inputFrom.addEventListener('input', e => { firmwareVersions.from = e.target.value.trim(); });
+    if (inputTo) inputTo.addEventListener('input', e => { firmwareVersions.to = e.target.value.trim(); });
+
+    // Wire save button
+    const saveBtn = document.getElementById('fw-save');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        logFirmwareNote();
+        saveBtn.textContent = '✓ Logged';
+        saveBtn.style.background = 'var(--green-dim)';
+        saveBtn.style.borderColor = 'var(--green)';
+        saveBtn.style.color = 'var(--green)';
+        setTimeout(() => {
+          saveBtn.textContent = 'Save to log';
+          saveBtn.style.background = '';
+          saveBtn.style.borderColor = '';
+          saveBtn.style.color = '';
+        }, 1800);
+      });
+    }
+
+    // Wire non-firmware checkboxes
+    banner.querySelectorAll('.prereq-check').forEach(el => {
+      el.addEventListener('click', () => {
+        const order = parseInt(el.dataset.prereqOrder);
+        prereqChecks[order] = !prereqChecks[order];
+        renderPrereqs();
+      });
+    });
+
+    // Wire device selectors
+    wireDeviceSelectors();
+  }
+
+  // ── ERROR LIST ──
+  function errBelongsToView(err) {
+    const views = err.views || ['errors'];
+    if (currentView === 'errors') return views.includes('errors');
+    if (currentView === 'flags') return true; // all errors can have flags
+    if (currentView === 'installation_service') return views.includes('installation_service');
+    return true;
+  }
+
+  function filteredErrors() {
+    return playbook.errors.filter(err => {
+      if (!errBelongsToView(err)) return false;
+
+      const errFlags = err.flags || [];
+      const isEscalate = err.escalate;
+
+      let matchesFilter;
+      if (currentFilter === 'all') {
+        matchesFilter = true;
+      } else if (currentView === 'flags') {
+        if (currentFilter === 'escalate') matchesFilter = isEscalate;
+        else matchesFilter = errFlags.includes(currentFilter);
+      } else {
+        matchesFilter = err.app_error === currentFilter;
+      }
+
+      const searchStr = [err.app_error, err.st2_error_code, err.meaning, err.variant,
+        ...errFlags, isEscalate ? 'escalate' : '']
+        .filter(Boolean).join(' ').toLowerCase();
+      const matchesSearch = !currentSearch || searchStr.includes(currentSearch);
+
+      return matchesFilter && matchesSearch;
+    });
+  }
+
+  function getFlagBadgesSm(err) {
+    const flags = err.flags || [];
+    const badges = [];
+    if (flags.includes('fatal'))
+      badges.push('<span class="badge-flag-sm fatal">Fatal</span>');
+    if (flags.includes('potentially_fatal'))
+      badges.push('<span class="badge-flag-sm potentially_fatal">P. Fatal</span>');
+    if (err.escalate)
+      badges.push('<span class="badge badge-escalate">Escalate</span>');
+    return badges.join('');
+  }
+
+  function renderList() {
+    const list = document.getElementById('error-list');
+    const errors = filteredErrors();
+    document.getElementById('result-count').textContent = `${errors.length} result${errors.length !== 1 ? 's' : ''}`;
+
+    if (errors.length === 0) {
+      list.innerHTML = `<div class="no-results">No errors match your filters.</div>`;
+      return;
+    }
+
+    list.innerHTML = errors.map((err, i) => {
+      const globalIdx = playbook.errors.indexOf(err);
+      const isActive = globalIdx === activeIndex;
+      const checkedCount = checkedSteps[err.st2_error_code]?.size || 0;
+      const totalSteps = err.steps.length;
+      const progressDot = checkedCount > 0 && checkedCount < totalSteps
+        ? `<span style="font-family:var(--mono);font-size:9px;color:var(--warn);margin-left:4px;">${checkedCount}/${totalSteps}</span>`
+        : checkedCount > 0 && checkedCount === totalSteps
+        ? `<span style="font-family:var(--mono);font-size:9px;color:var(--green);margin-left:4px;">✓</span>`
+        : '';
+
+      return `
+        <div class="error-item ${isActive ? 'active' : ''}" data-idx="${globalIdx}">
+          <div class="error-item-top">
+            <span class="app-error-label">${err.app_error || '<span style="color:var(--text-muted)">—</span>'}${progressDot}</span>
+            ${err.escalate ? `<span class="badge badge-escalate">Escalate</span>` : ''}
+          </div>
+          <div class="st2-code">${err.st2_error_code}</div>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.error-item').forEach(el => {
+      el.addEventListener('click', () => {
+        activeIndex = parseInt(el.dataset.idx);
+        renderList();
+        renderDetail(playbook.errors[activeIndex]);
+      });
+    });
+  }
+
+  // ── DETAIL ──
+  const noteIcons = {
+    diagnostic_hint: '🔍',
+    version_specific: '⚠️',
+    hardware_variant: '🔧',
+    efficiency_tip: '💡',
+  };
+
+  // ── BRANCHING FLOW STATE ──
+  // branchState[code] = { checkpoint1: 'yes'|'no', checkpoint2: ..., checkpoint3: ... }
+  let branchState = {};
+
+  function getStepsByOrders(err, orders) {
+    return orders.map(o => err.steps.find(s => s.order === o)).filter(Boolean);
+  }
+
+  function renderStepBlock(err, steps, checks) {
+    return steps.map(s => {
+      const isDone = checks.has(s.order);
+      const isEscalate = s.action.toLowerCase().includes('escalate');
+      return `
+        <div class="step-item ${isDone ? 'done' : ''} ${isEscalate ? 'escalate-step' : ''}">
+          <span class="step-num">${s.order}.</span>
+          <div class="step-content">
+            <div class="step-action">${s.action}</div>
+            ${s.detail ? `<div class="step-detail">${s.detail}</div>` : ''}
+          </div>
+          <div class="step-check ${isDone ? 'checked' : ''}" data-code="${err.st2_error_code}" data-order="${s.order}" title="Mark complete"></div>
+        </div>`;
+    }).join('');
+  }
+
+  function buildBranchingHtml(err) {
+    const bf = err.branching_flow;
+    const code = err.st2_error_code;
+    const checks = checkedSteps[code] || new Set();
+    const bs = branchState[code] || {};
+    const linearSteps = getStepsByOrders(err, bf.linear_steps || []);
+    const attemptSteps = getStepsByOrders(err, bf.then_attempt_steps || []);
+
+    const cp = bf.checkpoint;
+    const cp2 = cp?.no?.then_checkpoint;
+    const cp3 = cp2?.no?.then_checkpoint;
+
+    let html = `<div class="branch-section"><div class="section-title">Troubleshooting Steps</div><div class="branch-steps-list">`;
+
+    // Linear steps
+    html += renderStepBlock(err, linearSteps, checks);
+
+    // Attempt steps (C2 only — steps 5–9 shown after 1–3)
+    if (attemptSteps.length > 0) html += renderStepBlock(err, attemptSteps, checks);
+
+    // ── Checkpoint 1 ──
+    html += `
+      <div class="branch-checkpoint" id="bcp1-${code}">
+        <div class="branch-checkpoint-q">${cp.question}</div>
+        <div class="branch-checkpoint-btns">
+          <button class="branch-btn yes ${bs.cp1 === 'yes' ? 'selected' : ''}" data-cp="1" data-choice="yes" data-code="${code}">Yes</button>
+          <button class="branch-btn no ${bs.cp1 === 'no' ? 'selected' : ''}" data-cp="1" data-choice="no" data-code="${code}">No</button>
+        </div>
+      </div>`;
+
+    // Yes branch 1 → show final steps
+    if (bs.cp1 === 'yes') {
+      const yesSteps = getStepsByOrders(err, cp.yes.next_steps);
+      html += `<div class="branch-continuation visible"><div class="branch-steps-list">${renderStepBlock(err, yesSteps, checks)}</div></div>`;
+    }
+
+    // No branch 1 → action + repeat + checkpoint 2
+    if (bs.cp1 === 'no' && cp2) {
+      const repeatSteps = getStepsByOrders(err, cp.no.then_repeat_steps || []);
+      html += `<div class="branch-continuation visible">
+        <div class="branch-continuation-action">${cp.no.action}</div>
+        ${repeatSteps.length > 0 ? `<div class="branch-repeat-label">Repeat steps</div><div class="branch-steps-list">${renderStepBlock(err, repeatSteps, checks)}</div>` : ''}
+        <div class="branch-checkpoint" id="bcp2-${code}">
+          <div class="branch-checkpoint-q">${cp2.question}</div>
+          <div class="branch-checkpoint-btns">
+            <button class="branch-btn yes ${bs.cp2 === 'yes' ? 'selected' : ''}" data-cp="2" data-choice="yes" data-code="${code}">Yes</button>
+            <button class="branch-btn no ${bs.cp2 === 'no' ? 'selected' : ''}" data-cp="2" data-choice="no" data-code="${code}">No</button>
+          </div>
+        </div>`;
+
+      // Yes branch 2
+      if (bs.cp2 === 'yes') {
+        const yesSteps2 = getStepsByOrders(err, cp2.yes.next_steps);
+        html += `<div class="branch-continuation visible"><div class="branch-steps-list">${renderStepBlock(err, yesSteps2, checks)}</div></div>`;
+      }
+
+      // No branch 2 → action + repeat + checkpoint 3
+      if (bs.cp2 === 'no' && cp3) {
+        const repeatSteps2 = getStepsByOrders(err, cp2.no.then_repeat_steps || []);
+        html += `<div class="branch-continuation visible">
+          <div class="branch-continuation-action">${cp2.no.action}</div>
+          ${repeatSteps2.length > 0 ? `<div class="branch-repeat-label">Repeat steps</div><div class="branch-steps-list">${renderStepBlock(err, repeatSteps2, checks)}</div>` : ''}
+          <div class="branch-checkpoint" id="bcp3-${code}">
+            <div class="branch-checkpoint-q">${cp3.question}</div>
+            <div class="branch-checkpoint-btns">
+              <button class="branch-btn yes ${bs.cp3 === 'yes' ? 'selected' : ''}" data-cp="3" data-choice="yes" data-code="${code}">Yes</button>
+              <button class="branch-btn no ${bs.cp3 === 'no' ? 'selected' : ''}" data-cp="3" data-choice="no" data-code="${code}">No</button>
+            </div>
+          </div>`;
+
+        if (bs.cp3 === 'yes') {
+          const yesSteps3 = getStepsByOrders(err, cp3.yes.next_steps);
+          html += `<div class="branch-continuation visible"><div class="branch-steps-list">${renderStepBlock(err, yesSteps3, checks)}</div></div>`;
+        }
+        if (bs.cp3 === 'no') {
+          const noSteps3 = getStepsByOrders(err, cp3.no.next_steps);
+          html += `<div class="branch-continuation visible"><div class="branch-steps-list">${renderStepBlock(err, noSteps3, checks)}</div></div>`;
+        }
+
+        html += `</div>`; // close no-2 continuation
+      }
+
+      // No branch 2 no cp3 — direct next steps
+      if (bs.cp2 === 'no' && !cp3 && cp2.no.next_steps) {
+        const noSteps2 = getStepsByOrders(err, cp2.no.next_steps);
+        html += `<div class="branch-continuation visible"><div class="branch-steps-list">${renderStepBlock(err, noSteps2, checks)}</div></div>`;
+      }
+
+      html += `</div>`; // close no-1 continuation
+    }
+
+    html += `</div></div>`; // close branch-steps-list + branch-section
+    return html;
+  }
+
+  function renderDetail(err) {
+    const panel = document.getElementById('detail-content');
+    // Update ticket header since active error may have changed
+    setTimeout(renderTicketHeader, 0);
+    if (!err) {
+      panel.innerHTML = `
+        <div class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <h3>Select an error to begin</h3>
+          <p>Choose an error from the sidebar to view troubleshooting steps.</p>
+        </div>`;
+      return;
+    }
+
+    const checks = checkedSteps[err.st2_error_code] || new Set();
+    const checkedCount = checks.size;
+    const totalSteps = err.steps.length;
+    const progressPct = totalSteps > 0 ? Math.round((checkedCount / totalSteps) * 100) : 0;
+
+    const stepsHtml = err.branching_flow
+      ? buildBranchingHtml(err)
+      : err.steps.length > 0 ? `
+      <div class="section">
+        <div class="section-title">Troubleshooting Steps</div>
+        <div class="progress-bar-wrap ${checkedCount > 0 ? 'visible' : ''}">
+          <div class="progress-label">
+            <span>Progress</span>
+            <span>${checkedCount} / ${totalSteps} steps</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+          ${checkedCount > 0 ? `<button class="btn-reset-progress" data-code="${err.st2_error_code}">Reset progress</button>` : ''}
+        </div>
+        <div class="steps-list">
+          ${err.steps.map(s => {
+            const isDone = checks.has(s.order);
+            const isEscalate = s.action.toLowerCase().includes('escalate');
+            return `
+              <div class="step-item ${isDone ? 'done' : ''} ${isEscalate ? 'escalate-step' : ''}">
+                <span class="step-num">${s.order}.</span>
+                <div class="step-content">
+                  <div class="step-action">${s.action}</div>
+                  ${s.detail ? `<div class="step-detail">${s.detail}</div>` : ''}
+                </div>
+                <div class="step-check ${isDone ? 'checked' : ''}" data-code="${err.st2_error_code}" data-order="${s.order}" title="Mark complete"></div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>` : '';
+
+    // Schematic panel
+    const schematicHtml = err.schematic ? (() => {
+      const code = err.st2_error_code;
+      const path = SCHEMATIC_PATHS[code] || '';
+      return `
+        <div class="section">
+          <div class="section-title">Schematic</div>
+          <div class="schematic-placeholder" id="schematic-card-${code}" style="cursor:zoom-in;">
+            <div class="schematic-img-wrap">
+              ${path
+                ? `<img src="${path}" alt="${err.app_error}" id="schematic-img-${code}" onerror="this.parentElement.innerHTML='<div class=\'schematic-empty\'><p>Schematic image not found in repo.<br><code>${path}</code></p></div>'">`
+                : `<div class="schematic-empty">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    <p>Schematic image not yet added to repo.</p>
+                  </div>`
+              }
+            </div>
+            ${path ? `
+            <div class="schematic-fullscreen-hint">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              Tap image to view fullscreen
+            </div>` : ''}
+          </div>
+        </div>`;
+    })() : '';
+
+    const notesHtml = err.notes && err.notes.length > 0 ? `
+      <div class="section">
+        <div class="section-title">Notes</div>
+        <div class="notes-list">
+          ${err.notes.map(n => `
+            <div class="note-item ${n.type}">
+              <span class="note-icon">${noteIcons[n.type] || 'ℹ️'}</span>
+              <span>${n.text}</span>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
+
+    const videosHtml = (err.videos && err.videos.length > 0) ? `
+      <div class="section video-section">
+        <div class="section-title">Reference Videos</div>
+        <div class="video-player-wrap">
+          ${err.videos.map(v => {
+            const path = VIDEO_PATHS[v.filename] || v.filename;
+            return `
+              <div class="video-card">
+                <div class="video-card-header">
+                  <span class="video-card-label">🎬 ${v.label}</span>
+                  <span class="video-card-filename">${v.filename}</span>
+                </div>
+                <video class="video-player-el" controls playsinline>
+                  <source src="${path}">
+                </video>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>` : '';
+
+    panel.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-badges">
+          ${err.app_error ? `<span class="badge-app">${err.app_error}</span>` : ''}
+          ${err.variant ? `<span class="badge-variant">${err.variant}</span>` : ''}
+          ${(err.flags||[]).includes('fatal') ? `<span class="badge-fatal">⚠ Fatal</span>` : ''}
+          ${(err.flags||[]).includes('potentially_fatal') ? `<span class="badge-potentially-fatal">⚠ Potentially Fatal</span>` : ''}
+          ${err.escalate ? `<span class="badge-escalate-lg">⚠ Escalate to Engineering</span>` : ''}
+        </div>
+        <div class="detail-code">${err.st2_error_code}</div>
+        <div class="detail-meaning">${err.meaning}</div>
+      </div>
+      ${stepsHtml}
+      ${schematicHtml}
+      ${notesHtml}
+      ${videosHtml}
+    `;
+
+    // Branch checkpoint buttons
+    panel.querySelectorAll('.branch-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.dataset.code;
+        const cp = btn.dataset.cp;
+        const choice = btn.dataset.choice;
+        if (!branchState[code]) branchState[code] = {};
+        branchState[code][`cp${cp}`] = choice;
+        // Clear downstream choices when re-selecting
+        if (cp === '1') { delete branchState[code].cp2; delete branchState[code].cp3; }
+        if (cp === '2') { delete branchState[code].cp3; }
+        renderDetail(err);
+      });
+    });
+
+    // Schematic fullscreen
+    if (err.schematic) {
+      const code = err.st2_error_code;
+      const overlay = document.getElementById('schematic-overlay');
+      const overlayImg = document.getElementById('schematic-overlay-img');
+      const closeBtn = document.getElementById('schematic-overlay-close');
+      const img = panel.querySelector(`#schematic-img-${code}`);
+      if (img) {
+        img.addEventListener('click', () => {
+          overlayImg.src = img.src;
+          overlay.classList.add('open');
+        });
+      }
+      if (closeBtn) closeBtn.onclick = () => overlay.classList.remove('open');
+      if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    }
+
+    // Step checkboxes
+    panel.querySelectorAll('.step-check').forEach(el => {
+      el.addEventListener('click', () => {
+        const code = el.dataset.code;
+        const order = parseInt(el.dataset.order);
+        if (!checkedSteps[code]) checkedSteps[code] = new Set();
+        if (checkedSteps[code].has(order)) {
+          checkedSteps[code].delete(order);
+          // remove from session log
+          removeStepFromSession(err, order);
+        } else {
+          checkedSteps[code].add(order);
+          // add to session log
+          const step = err.steps.find(s => s.order === order);
+          if (step) addStepToSession(err, step);
+        }
+        renderDetail(err);
+        renderList(); // update progress indicators in sidebar
+      });
+    });
+
+    // Reset progress
+    panel.querySelectorAll('.btn-reset-progress').forEach(el => {
+      el.addEventListener('click', () => {
+        const code = el.dataset.code;
+        // remove this error's steps from session log
+        if (sessionLog[code]) {
+          delete sessionLog[code];
+          renderSessionLog();
+        }
+        checkedSteps[code] = new Set();
+        renderDetail(err);
+        renderList();
+      });
+    });
+  }
+</script>
+</body>
+</html>
 
