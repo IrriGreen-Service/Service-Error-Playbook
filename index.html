@@ -1484,6 +1484,7 @@
   const SCHEMATIC_PATHS = {
     'SMART_VALVE_SCHEMATIC': 'smart_valve_schematic.png',
     'SPRINKLER_3_SCHEMATIC': 'sprinkler_3_schematic.png',
+    'GOOD_CALIBRATION_EXAMPLE': 'good_calibration_example.png',
   };
 
   // ── VIDEO PATHS — served directly from repo ──
@@ -1668,9 +1669,23 @@
   function initApp() {
     document.getElementById('file-count').textContent = `${playbook.errors.length} errors loaded`;
 
+    // Wire view toggle buttons
+    document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const newView = btn.dataset.view;
+        if (newView === 'flags') return; // BETA — no action yet
+        currentView = newView;
+        document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Reset device + error selection on view switch
+        deviceState = { type: '', model: '', zone: '', controllerNumber: '', selectedError: '', wifiAnswer: '' };
+        renderPrereqs();
+        renderDetail(null);
+      });
+    });
+
     renderPrereqs();
     renderDetail(null);
-
   }
 
   // ── BUILD FILTER BUTTONS based on currentView ──
@@ -1827,7 +1842,6 @@
         deviceState.wifiAnswer = '';
         renderPrereqs();
         renderTicketHeader();
-        autoSelectFromDevice();
       });
     }
     if (modelEl) {
@@ -1835,7 +1849,6 @@
         deviceState.model = e.target.value;
         renderPrereqs();
         renderTicketHeader();
-        autoSelectFromDevice();
       });
     }
     if (zoneEl) {
@@ -1871,7 +1884,7 @@
     }
 
     // Wire wifi branch buttons (rendered inside prereq banner)
-    banner.querySelectorAll('.wifi-btn').forEach(btn => {
+    document.getElementById('prereq-banner').querySelectorAll('.wifi-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         deviceState.wifiAnswer = btn.dataset.wifi;
         renderPrereqs();
@@ -1879,7 +1892,7 @@
     });
 
     // Wire inline step checkboxes (rendered inside prereq banner)
-    banner.querySelectorAll('.step-check[data-code]').forEach(el => {
+    document.getElementById('prereq-banner').querySelectorAll('.step-check[data-code]').forEach(el => {
       el.addEventListener('click', () => {
         const code = el.dataset.code;
         const order = parseInt(el.dataset.order);
@@ -1899,7 +1912,7 @@
     });
 
     // Wire branch checkpoint buttons inside prereq banner
-    banner.querySelectorAll('.branch-btn').forEach(btn => {
+    document.getElementById('prereq-banner').querySelectorAll('.branch-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const code = btn.dataset.code;
         const cp = btn.dataset.cp;
@@ -2123,10 +2136,13 @@
         </div>`;
     }
 
+    const isInstall = currentView === 'installation_service';
+
     banner.innerHTML = `
       <div class="device-selector-section">
-        <div class="device-selector-title">Device</div>
+        <div class="device-selector-title">${isInstall ? 'Installation & Service' : 'Device'}</div>
         <div class="device-selector-rows" id="device-rows">
+          ${isInstall ? '' : `
           <div class="device-selector-row">
             <span class="device-selector-label">Type</span>
             <select class="device-select" id="dev-type">
@@ -2138,11 +2154,14 @@
           </div>
           ${deviceModelRowHtml()}
           ${deviceZoneRowHtml()}
+          `}
           ${errorDropdownHtml()}
         </div>
       </div>
+      ${isInstall ? '' : `
       <div class="prereq-banner-title" style="padding:14px 24px 0;">Before You Begin</div>
       <div class="prereq-steps" style="padding:8px 24px 6px;">${stepsHtml}</div>
+      `}
       ${inlineTroubleshootingHtml()}
     `;
 
@@ -2192,7 +2211,7 @@
     }
 
     // Wire non-firmware checkboxes
-    banner.querySelectorAll('.prereq-check').forEach(el => {
+    document.getElementById('prereq-banner').querySelectorAll('.prereq-check').forEach(el => {
       el.addEventListener('click', () => {
         const order = parseInt(el.dataset.prereqOrder);
         prereqChecks[order] = !prereqChecks[order];
@@ -2404,10 +2423,13 @@
     // Schematic panel
     const schematicHtml = err.schematic ? (() => {
       const code = err.st2_error_code;
-      const path = SCHEMATIC_PATHS[code] || '';
+      const pathKey = err.schematic_key || code;
+      const path = SCHEMATIC_PATHS[pathKey] || '';
+      const sectionLabel = err.schematic_key === 'GOOD_CALIBRATION_EXAMPLE'
+        ? 'Example: Good Calibration' : 'Schematic';
       return `
         <div class="section">
-          <div class="section-title">Schematic</div>
+          <div class="section-title">${sectionLabel}</div>
           <div class="schematic-placeholder" id="schematic-card-${code}" style="cursor:zoom-in;">
             <div class="schematic-img-wrap">
               ${path

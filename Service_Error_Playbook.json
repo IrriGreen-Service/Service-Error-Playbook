@@ -1009,14 +1009,17 @@
         {
           "order": 4,
           "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
-        },
-        {
-          "order": 5,
-          "action": "If throw is still short, disable AutoWater and redo calibration"
         }
       ],
-      "notes": [],
-      "device_type": "sprinkler"
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "You're unlikely to perfectly match with S3. You also expect a much smaller RCO on S3. New calibration model using spline in the near future will address this."
+        }
+      ],
+      "device_type": "sprinkler",
+      "schematic": true,
+      "schematic_key": "GOOD_CALIBRATION_EXAMPLE"
     },
     {
       "app_error": "Throw Issue",
@@ -1041,14 +1044,17 @@
         {
           "order": 4,
           "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
-        },
-        {
-          "order": 5,
-          "action": "If throw is still long, disable AutoWater and redo calibration"
         }
       ],
-      "notes": [],
-      "device_type": "sprinkler"
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "You're unlikely to perfectly match with S3. You also expect a much smaller RCO on S3. New calibration model using spline in the near future will address this."
+        }
+      ],
+      "device_type": "sprinkler",
+      "schematic": true,
+      "schematic_key": "GOOD_CALIBRATION_EXAMPLE"
     },
     {
       "app_error": "Throw Issue",
@@ -1089,8 +1095,15 @@
           "detail": "With pressure sensor disabled, automatic calibration is no longer available. Copy calibration from a nearby head of the same model, or request factory default calibration values from engineering if no other head is available to copy from"
         }
       ],
-      "notes": [],
-      "device_type": "sprinkler"
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "You're unlikely to perfectly match with S3. You also expect a much smaller RCO on S3. New calibration model using spline in the near future will address this."
+        }
+      ],
+      "device_type": "sprinkler",
+      "schematic": true,
+      "schematic_key": "GOOD_CALIBRATION_EXAMPLE"
     },
     {
       "app_error": "Throw Issue",
@@ -1119,20 +1132,23 @@
         },
         {
           "order": 5,
-          "action": "If AutoWater is enabled, disable it"
-        },
-        {
-          "order": 6,
           "action": "Re-calibrate the head \u2014 review the successful calibration and ensure the curve matches; adjust the curve if needed and input new calibration values"
         },
         {
-          "order": 7,
+          "order": 6,
           "action": "If this head has a history of pressure sensor errors and is generation 2.5 (1.52) or newer, enable the \"Disable Pressure Sensor\" mitigation",
           "detail": "With pressure sensor disabled, automatic calibration is no longer available. Copy calibration from a nearby head of the same model, or request factory default calibration values from engineering if no other head is available to copy from"
         }
       ],
-      "notes": [],
-      "device_type": "sprinkler"
+      "notes": [
+        {
+          "type": "diagnostic_hint",
+          "text": "You're unlikely to perfectly match with S3. You also expect a much smaller RCO on S3. New calibration model using spline in the near future will address this."
+        }
+      ],
+      "device_type": "sprinkler",
+      "schematic": true,
+      "schematic_key": "GOOD_CALIBRATION_EXAMPLE"
     },
     {
       "app_error": "Not Discoverable",
