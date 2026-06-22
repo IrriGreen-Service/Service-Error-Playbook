@@ -705,51 +705,58 @@
       "steps": [
         {
           "order": 1,
-          "action": "Make sure the black antenna on top of the controller box is present and securely fastened"
+          "action": "Has the home WiFi network changed?",
+          "wifi_branch": true,
+          "yes_note": "If yes, skip to the network reconnection steps",
+          "no_note": "If no, continue with all steps in order"
         },
         {
           "order": 2,
-          "action": "Soft reset the controller by holding the green button for 1 second \u2014 it will attempt to automatically reconnect to the home network"
+          "action": "Make sure the black antenna on top of the controller box is present and securely fastened"
         },
         {
           "order": 3,
-          "action": "Clear cache: have customer disconnect transformer, remove both batteries on the bottom left corner of the controller board, and let it sit overnight"
+          "action": "Soft reset the controller by holding the green button for 1 second \u2014 it will attempt to automatically reconnect to the home network"
         },
         {
           "order": 4,
+          "action": "Clear cache: have customer disconnect transformer, remove both batteries on the bottom left corner of the controller board, and let it sit overnight"
+        },
+        {
+          "order": 5,
           "action": "Reset controller: hold the red button, then hold the green button for 1 second and release it, tap the blue button, wait for the cycling lights to finish, then release red",
           "detail": "See reference video: Reset_C2.MOV"
         },
         {
-          "order": 5,
+          "order": 6,
           "action": "Delete the network information saved in ST2.0: Controls > System > \"Wipe Network Cache\""
         },
         {
-          "order": 6,
+          "order": 7,
           "action": "Broadcast Bluetooth on the controller: hold the red button for 6 seconds"
         },
         {
-          "order": 7,
+          "order": 8,
           "action": "Have the customer disconnect from the controller in the IrriGreen App: More (bottom right) > \"Disconnect from controller\" (bottom)"
         },
         {
-          "order": 8,
+          "order": 9,
           "action": "Have the customer tap \"Add Controller\" and either scan the QR code or manually enter the controller number and password from the sticker on the controller box"
         },
         {
-          "order": 9,
+          "order": 10,
           "action": "Follow the prompts \u2014 when the app says it's offline and asks to continue with Bluetooth, tap yes and connect to the network using the password on the controller box sticker"
         },
         {
-          "order": 10,
+          "order": 11,
           "action": "Let the controller sync \u2014 when prompted, connect to the desired home network, ensuring it is a 2.4 GHz band"
         },
         {
-          "order": 11,
+          "order": 12,
           "action": "When online, manually update the controller and attached devices through ST2.0 if needed"
         },
         {
-          "order": 12,
+          "order": 13,
           "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
         }
       ],
@@ -771,50 +778,50 @@
       "branching_flow": {
         "description": "After steps 1\u20133, attempt network connection (steps 5\u20139), then branch on success.",
         "linear_steps": [
-          1,
           2,
-          3
+          3,
+          4
         ],
         "then_attempt_steps": [
-          5,
           6,
           7,
           8,
-          9
+          9,
+          10
         ],
-        "checkpoint_after_step": 9,
+        "checkpoint_after_step": 10,
         "checkpoint": {
           "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
           "yes": {
             "label": "Yes \u2014 connected",
             "next_steps": [
-              10,
-              11
+              11,
+              12
             ]
           },
           "no": {
             "label": "No \u2014 could not connect",
             "action": "Factory reset the controller: first create a backup in ST2.0 via Controls > Backups > Create Backup. Then perform the full reset (step 4): hold the red button, hold the green button for 1 second and release it, tap the blue button, wait for the cycling lights to finish, then release red.",
             "then_repeat_steps": [
-              5,
               6,
               7,
               8,
-              9
+              9,
+              10
             ],
             "then_checkpoint": {
               "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
               "yes": {
                 "label": "Yes \u2014 connected",
                 "next_steps": [
-                  10,
-                  11
+                  11,
+                  12
                 ]
               },
               "no": {
                 "label": "No \u2014 still could not connect",
                 "next_steps": [
-                  12
+                  13
                 ]
               }
             }
@@ -831,38 +838,45 @@
       "steps": [
         {
           "order": 1,
-          "action": "Delete the network information saved in ST2.0: Controls > System > \"Wipe Network Cache\""
+          "action": "Has the home WiFi network changed?",
+          "wifi_branch": true,
+          "yes_note": "If yes, skip to the network reconnection steps",
+          "no_note": "If no, continue with all steps in order"
         },
         {
           "order": 2,
-          "action": "Have the customer disconnect from the controller in the IrriGreen App: More (bottom right) > \"Disconnect from controller\" (bottom)"
+          "action": "Delete the network information saved in ST2.0: Controls > System > \"Wipe Network Cache\""
         },
         {
           "order": 3,
-          "action": "Press and hold the middle button (WiFi symbol above it) for ~5 seconds \u2014 ensure the digital display reads \"Bluetooth On\"; repeat if it says \"Bluetooth Off\""
+          "action": "Have the customer disconnect from the controller in the IrriGreen App: More (bottom right) > \"Disconnect from controller\" (bottom)"
         },
         {
           "order": 4,
-          "action": "Tap the leftmost button (hamburger menu above it), scroll with the dial until the display reads \"IG Network\", press the dial to confirm, then press again when display reads \"Confirm\""
+          "action": "Press and hold the middle button (WiFi symbol above it) for ~5 seconds \u2014 ensure the digital display reads \"Bluetooth On\"; repeat if it says \"Bluetooth Off\""
         },
         {
           "order": 5,
-          "action": "In their IrriGreen app, have the customer tap \"Add Controller\" and either scan the QR code or manually enter the controller number and password from the sticker on the controller box"
+          "action": "Tap the leftmost button (hamburger menu above it), scroll with the dial until the display reads \"IG Network\", press the dial to confirm, then press again when display reads \"Confirm\""
         },
         {
           "order": 6,
-          "action": "Follow the prompts \u2014 when the app says it's offline and asks to continue with Bluetooth, tap yes and connect to the network using the password on the controller box sticker"
+          "action": "In their IrriGreen app, have the customer tap \"Add Controller\" and either scan the QR code or manually enter the controller number and password from the sticker on the controller box"
         },
         {
           "order": 7,
-          "action": "Let the controller sync \u2014 when prompted, connect to the desired home network, ensuring it is a 2.4 or 5 GHz band"
+          "action": "Follow the prompts \u2014 when the app says it's offline and asks to continue with Bluetooth, tap yes and connect to the network using the password on the controller box sticker"
         },
         {
           "order": 8,
-          "action": "When online, manually update the controller and attached devices through ST2.0 if needed"
+          "action": "Let the controller sync \u2014 when prompted, connect to the desired home network, ensuring it is a 2.4 or 5 GHz band"
         },
         {
           "order": 9,
+          "action": "When online, manually update the controller and attached devices through ST2.0 if needed"
+        },
+        {
+          "order": 10,
           "action": "If the error persists, replace under warranty if applicable or have the customer purchase a replacement"
         }
       ],
@@ -873,67 +887,67 @@
       "branching_flow": {
         "description": "After completing steps 1\u20136, a confirmation branch determines next steps.",
         "linear_steps": [
-          1,
           2,
           3,
           4,
           5,
-          6
+          6,
+          7
         ],
-        "checkpoint_after_step": 6,
+        "checkpoint_after_step": 7,
         "checkpoint": {
           "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
           "yes": {
             "label": "Yes \u2014 connected",
             "next_steps": [
-              7,
-              8
+              8,
+              9
             ]
           },
           "no": {
             "label": "No \u2014 could not connect",
             "action": "Soft reset the controller: use a flathead screwdriver to remove the topmost black plate in the IrriGreen controller box, then press the small circular reset button for about 1 second",
             "then_repeat_steps": [
-              1,
               2,
               3,
               4,
               5,
-              6
+              6,
+              7
             ],
             "then_checkpoint": {
               "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
               "yes": {
                 "label": "Yes \u2014 connected",
                 "next_steps": [
-                  7,
-                  8
+                  8,
+                  9
                 ]
               },
               "no": {
                 "label": "No \u2014 still could not connect",
                 "action": "Factory reset the controller: first create a backup in ST2.0 via Controls > Backups > Create Backup. Then have the customer push in and hold the dial, push in and hold the WiFi button, then push in the reset button for 1 second \u2014 all buttons can then be released. Wait for the controller to come back online.",
                 "then_repeat_steps": [
-                  1,
                   2,
                   3,
                   4,
                   5,
-                  6
+                  6,
+                  7
                 ],
                 "then_checkpoint": {
                   "question": "Were you able to connect to the IrriGreen network (broadcast as \"IrriGreen-[Controller#]\")?",
                   "yes": {
                     "label": "Yes \u2014 connected",
                     "next_steps": [
-                      7,
-                      8
+                      8,
+                      9
                     ]
                   },
                   "no": {
                     "label": "No \u2014 still could not connect",
                     "next_steps": [
-                      9
+                      10
                     ]
                   }
                 }
