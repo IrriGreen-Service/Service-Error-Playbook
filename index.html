@@ -2014,8 +2014,24 @@
       const errors = playbook.errors.filter(e => {
         const views = e.views || ['errors'];
         if (currentView === 'installation_service') return views.includes('installation_service');
-        return views.includes('errors');
+        if (!views.includes('errors')) return false;
+        // Filter by device_type if one is selected
+        if (deviceState.type && e.device_type) {
+          return e.device_type === deviceState.type;
+        }
+        // No device selected — show nothing until a type is picked
+        if (deviceState.type && !e.device_type) return true; // untagged entries always show
+        return false;
       });
+      if (!deviceState.type && currentView !== 'installation_service') {
+        return `
+          <div class="device-selector-row" style="margin-top:8px;">
+            <span class="device-selector-label">Issue</span>
+            <select class="device-select" disabled>
+              <option>— Select a device type first —</option>
+            </select>
+          </div>`;
+      }
       const opts = errors.map(e => {
         const label = e.variant ? `${e.app_error} — ${e.variant}` : (e.app_error ? `${e.app_error} — ${e.st2_error_code}` : e.st2_error_code);
         return `<option value="${e.st2_error_code}" ${deviceState.selectedError === e.st2_error_code ? 'selected' : ''}>${label}</option>`;
@@ -2523,7 +2539,7 @@
           renderSessionLog();
         }
         checkedSteps[code] = new Set();
-        renderDetail(err);  
+        renderDetail(err);
       });
     });
   }
