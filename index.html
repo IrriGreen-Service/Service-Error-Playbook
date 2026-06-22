@@ -2196,8 +2196,12 @@
       <div class="prereq-banner-title" style="padding:14px 24px 0;">Before You Begin</div>
       <div class="prereq-steps" style="padding:8px 24px 6px;">${stepsHtml}</div>
       `}
-      ${inlineTroubleshootingHtml()}
     `;
+
+    // Append inline troubleshooting content separately to avoid template literal nesting issues
+    const inlineDiv = document.createElement('div');
+    inlineDiv.innerHTML = inlineTroubleshootingHtml();
+    banner.appendChild(inlineDiv);
 
     // Wire firmware buttons
     const btnOk = document.getElementById('fw-btn-ok');
