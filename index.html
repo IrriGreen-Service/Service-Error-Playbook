@@ -1883,6 +1883,16 @@
       });
     }
 
+    // Wire inline schematic fullscreen
+    document.getElementById('prereq-banner').querySelectorAll('[id^="schematic-img-inline-"]').forEach(img => {
+      img.addEventListener('click', () => {
+        const overlay = document.getElementById('schematic-overlay');
+        const overlayImg = document.getElementById('schematic-overlay-img');
+        overlayImg.src = img.src;
+        overlay.classList.add('open');
+      });
+    });
+
     // Wire wifi branch buttons (rendered inside prereq banner)
     document.getElementById('prereq-banner').querySelectorAll('.wifi-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2122,6 +2132,29 @@
           </div>
         </div>` : '';
 
+      // Schematic / reference image
+      const inlineSchematicHtml = err.schematic ? (() => {
+        const pathKey = err.schematic_key || err.st2_error_code;
+        const path = SCHEMATIC_PATHS[pathKey] || '';
+        const sectionLabel = err.schematic_key === 'GOOD_CALIBRATION_EXAMPLE'
+          ? 'Example: Good Calibration' : 'Schematic';
+        if (!path) return '';
+        return `
+          <div class="section" style="margin-top:12px;">
+            <div class="section-title">${sectionLabel}</div>
+            <div class="schematic-placeholder" id="schematic-card-inline-${err.st2_error_code}" style="cursor:zoom-in;">
+              <div class="schematic-img-wrap">
+                <img src="${path}" alt="${sectionLabel}" id="schematic-img-inline-${err.st2_error_code}"
+                  onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('afterend','<div class=\'schematic-empty\'><p>Image not found in repo.</p></div>')">
+              </div>
+              <div class="schematic-fullscreen-hint">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                Tap image to view fullscreen
+              </div>
+            </div>
+          </div>`;
+      })() : '';
+
       return `
         <div style="padding:14px 24px 0;">
           <div class="prereq-banner-title" style="margin-bottom:8px;">
@@ -2133,6 +2166,7 @@
           <div style="font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:10px;">${err.meaning || ''}</div>
           ${stepsHtmlInner}
           ${notesHtmlInner}
+          ${inlineSchematicHtml}
         </div>`;
     }
 
