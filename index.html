@@ -83,185 +83,6 @@
     flex-direction: column;
   }
 
-  /* ── TOOLBAR ── */
-  .toolbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .search-wrap {
-    position: relative;
-    flex: 1;
-    min-width: 200px;
-    max-width: 360px;
-  }
-
-  .search-wrap svg {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    pointer-events: none;
-  }
-
-  #search {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px 12px 8px 34px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  #search:focus { border-color: var(--accent); }
-  #search::placeholder { color: var(--text-muted); }
-
-  .filter-group {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
-  .filter-btn:hover { border-color: var(--border-bright); color: var(--text-dim); }
-  .filter-btn.active {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-  .toolbar-right {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  #result-count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-
-  .btn-reset {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-reset:hover { border-color: var(--border-bright); color: var(--text-dim); }
-
-  /* ── LAYOUT ── */
-  .app-body {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    height: calc(100vh - 56px - 57px); flex: 1;
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 300px;
-    min-width: 260px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    flex-shrink: 0;
-  }
-
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
-
-  .error-list { padding: 8px 0; }
-
-  .error-item {
-    padding: 10px 16px;
-    cursor: pointer;
-    border-left: 2px solid transparent;
-    transition: all 0.15s;
-    position: relative;
-  }
-
-  .error-item:hover {
-    background: var(--surface2);
-    border-left-color: var(--border-bright);
-  }
-
-  .error-item.active {
-    background: var(--accent-glow);
-    border-left-color: var(--accent);
-  }
-
-  .error-item-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 3px;
-  }
-
-  .app-error-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-dim);
-  }
-
-  .error-item.active .app-error-label { color: var(--accent); }
-
-  .badge {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    flex-shrink: 0;
-  }
-
-  .badge-escalate {
-    background: var(--danger-dim);
-    color: var(--danger);
-    border: 1px solid rgba(239,68,68,0.3);
-  }
-
-  .st2-code {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
   /* ── DETAIL PANEL ── */
   .detail-panel {
     flex: 1;
@@ -1312,6 +1133,62 @@
   .feedback-success svg { color: var(--green); }
   .feedback-success p { font-size: 14px; color: var(--text-dim); }
 
+
+  /* ── ERROR SELECTOR ── */
+  .error-selector-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .error-selector-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 52px;
+    flex-shrink: 0;
+  }
+  .wifi-branch-card {
+    margin-top: 8px;
+    background: var(--warn-dim);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .wifi-branch-q {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--warn);
+    line-height: 1.4;
+  }
+  .wifi-branch-btns { display: flex; gap: 8px; }
+  .wifi-btn {
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border-bright);
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-muted);
+  }
+  .wifi-btn.yes.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .wifi-btn.no.active  { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+  .wifi-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.45;
+    padding: 6px 10px;
+    background: var(--surface2);
+    border-radius: 5px;
+    display: none;
+  }
+  .wifi-note.visible { display: block; }
+
   /* ── LIGHT MODE ── */
   body.light {
     --bg: #f4f6f9;
@@ -1394,7 +1271,7 @@
   <div class="logo">Service Error<span> / Playbook</span></div>
   <div class="view-toggle" id="view-toggle">
     <button class="view-toggle-btn active" data-view="errors">Error Codes</button>
-    <button class="view-toggle-btn" data-view="flags">Flags</button>
+    <button class="view-toggle-btn" data-view="flags">Flags (BETA)</button>
     <button class="view-toggle-btn" data-view="installation_service">Installation &amp; Service</button>
   </div>
   <div class="header-right">
@@ -1412,28 +1289,9 @@
 
 <!-- APP SCREEN -->
 <div id="app-screen" style="display:flex;flex-direction:column;flex:1;">
-  <!-- TOOLBAR -->
-  <div class="toolbar">
-    <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="search" placeholder="Search errors, codes, keywords...">
-    </div>
-    <div class="filter-group" id="filter-group">
-      <button class="filter-btn active" data-filter="all">All</button>
-    </div>
-    <div class="toolbar-right">
-      <span id="result-count"></span>
-      <button class="btn-reset" id="reset-filters">Reset</button>
-    </div>
-  </div>
 
   <!-- BODY -->
-  <div class="app-body">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="error-list" id="error-list"></div>
-    </div>
-
+  <div class="app-body" style="display:flex;flex:1;overflow:hidden;height:calc(100vh - 56px);">
     <!-- DETAIL -->
     <div class="detail-panel" id="detail-panel">
       <div id="prereq-banner"></div>
@@ -1441,7 +1299,7 @@
         <div class="empty-state">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <h3>Select an error to begin</h3>
-          <p>Choose an error from the sidebar to view troubleshooting steps.</p>
+          <p>Select a device type and issue above to begin troubleshooting.</p>
         </div>
       </div>
     </div>
@@ -1645,7 +1503,7 @@
   let firmwareNoteLogged = false;
 
   // ── DEVICE SELECTOR STATE ──
-  let deviceState = { type: '', model: '', zone: '', controllerNumber: '' };
+  let deviceState = { type: '', model: '', zone: '', controllerNumber: '', selectedError: '', wifiAnswer: '' };
 
   // ── SESSION LOG ──
   // sessionLog: { [errorCode]: { appError, steps: [{order, action}] } }
@@ -1782,10 +1640,9 @@
     firmwareState = null;
     firmwareVersions = { from: '', to: '' };
     firmwareNoteLogged = false;
-    deviceState = { type: '', model: '', zone: '', controllerNumber: '' };
+    deviceState = { type: '', model: '', zone: '', controllerNumber: '', selectedError: '', wifiAnswer: '' };
     renderSessionLog();
     renderTicketHeader();
-    renderList();
     renderPrereqs();
     if (activeIndex !== null && playbook) renderDetail(playbook.errors[activeIndex]);
   });
@@ -1811,100 +1668,12 @@
   function initApp() {
     document.getElementById('file-count').textContent = `${playbook.errors.length} errors loaded`;
 
-    // Build dynamic filters based on current view
-    buildFilterButtons();
-
     renderPrereqs();
-    renderList();
     renderDetail(null);
 
-    // Wire view toggle
-    document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentView = btn.dataset.view;
-        currentFilter = 'all';
-        document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        buildFilterButtons();
-        renderList();
-      });
-    });
-
-    document.getElementById('filter-group').addEventListener('click', e => {
-      const btn = e.target.closest('.filter-btn');
-      if (!btn) return;
-      currentFilter = btn.dataset.filter;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderList();
-    });
-
-    document.getElementById('search').addEventListener('input', e => {
-      currentSearch = e.target.value.toLowerCase();
-      renderList();
-    });
-
-    document.getElementById('reset-filters').addEventListener('click', () => {
-      currentSearch = '';
-      currentFilter = 'all';
-      document.getElementById('search').value = '';
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector('[data-filter="all"]').classList.add('active');
-      renderList();
-    });
   }
 
   // ── BUILD FILTER BUTTONS based on currentView ──
-  function buildFilterButtons() {
-    const filterGroup = document.getElementById('filter-group');
-    filterGroup.innerHTML = '<button class="filter-btn active" data-filter="all">All</button>';
-
-    if (currentView === 'errors' && playbook) {
-      const appErrors = [...new Set(playbook.errors.map(e => e.app_error).filter(Boolean))].sort();
-      appErrors.forEach(ae => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.dataset.filter = ae;
-        btn.textContent = ae;
-        filterGroup.appendChild(btn);
-      });
-    } else if (currentView === 'flags') {
-      const flagDefs = [
-        { value: 'fatal',             label: 'Fatal',             cls: 'flag-fatal' },
-        { value: 'potentially_fatal', label: 'Potentially Fatal', cls: 'flag-potentially-fatal' },
-        { value: 'escalate',          label: 'Escalate',          cls: 'flag-escalate' },
-      ];
-      flagDefs.forEach(({ value, label, cls }) => {
-        const btn = document.createElement('button');
-        btn.className = `filter-btn ${cls}`;
-        btn.dataset.filter = value;
-        btn.textContent = label;
-        filterGroup.appendChild(btn);
-      });
-    } else if (currentView === 'installation_service' && playbook) {
-      // Sub-categories from app_error for installation_service entries
-      const cats = [...new Set(
-        playbook.errors
-          .filter(e => (e.views || ['errors']).includes('installation_service'))
-          .map(e => e.app_error)
-          .filter(Boolean)
-      )].sort();
-      cats.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.dataset.filter = cat;
-        btn.textContent = cat;
-        filterGroup.appendChild(btn);
-      });
-    }
-    // Re-apply currentFilter if it still exists in new set
-    const match = filterGroup.querySelector(`[data-filter="${currentFilter}"]`);
-    if (match) {
-      filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      match.classList.add('active');
-    }
-  }
-
   const MODEL_OPTIONS = {
     controller: [
       { value: 'C2', label: 'Controller 2' },
@@ -2042,31 +1811,6 @@
   }
 
   // Maps device type+model value to the variant string used in the JSON
-  const VARIANT_MAP = {
-    controller: { 'C2': 'Controller 2', 'C3': 'Controller 3' },
-    sprinkler:  {},  // no variants on sprinkler entries yet
-    valve:      { 'smart': 'Smart Valve', 'traditional': 'Traditional Valve' },
-  };
-
-  function autoSelectFromDevice() {
-    if (!playbook || !deviceState.type || !deviceState.model) return;
-    const variantLabel = (VARIANT_MAP[deviceState.type] || {})[deviceState.model];
-    if (!variantLabel) return;
-
-    // Find an error that matches the active filter AND the variant
-    const match = playbook.errors.find(err =>
-      err.variant === variantLabel &&
-      (currentFilter === 'all' || err.app_error === currentFilter)
-    );
-    if (!match) return;
-
-    const idx = playbook.errors.indexOf(match);
-    if (idx === activeIndex) return; // already showing it
-    activeIndex = idx;
-    renderList();
-    renderDetail(playbook.errors[activeIndex]);
-  }
-
   function wireDeviceSelectors() {
     const typeEl = document.getElementById('dev-type');
     const modelEl = document.getElementById('dev-model');
@@ -2079,6 +1823,8 @@
         deviceState.model = '';
         deviceState.zone = '';
         deviceState.controllerNumber = '';
+        deviceState.selectedError = '';
+        deviceState.wifiAnswer = '';
         renderPrereqs();
         renderTicketHeader();
         autoSelectFromDevice();
@@ -2106,6 +1852,66 @@
         renderTicketHeader();
       });
     }
+
+    const errorEl = document.getElementById('dev-error');
+    if (errorEl) {
+      errorEl.addEventListener('change', e => {
+        deviceState.selectedError = e.target.value;
+        deviceState.wifiAnswer = '';
+        // Auto-set activeIndex for session log / ticket header
+        if (deviceState.selectedError && playbook) {
+          const idx = playbook.errors.findIndex(err => err.st2_error_code === deviceState.selectedError);
+          if (idx !== -1) {
+            activeIndex = idx;
+            renderTicketHeader();
+          }
+        }
+        renderPrereqs();
+      });
+    }
+
+    // Wire wifi branch buttons (rendered inside prereq banner)
+    banner.querySelectorAll('.wifi-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deviceState.wifiAnswer = btn.dataset.wifi;
+        renderPrereqs();
+      });
+    });
+
+    // Wire inline step checkboxes (rendered inside prereq banner)
+    banner.querySelectorAll('.step-check[data-code]').forEach(el => {
+      el.addEventListener('click', () => {
+        const code = el.dataset.code;
+        const order = parseInt(el.dataset.order);
+        if (!checkedSteps[code]) checkedSteps[code] = new Set();
+        if (checkedSteps[code].has(order)) {
+          checkedSteps[code].delete(order);
+          const err = playbook.errors.find(e => e.st2_error_code === code);
+          if (err) removeStepFromSession(err, order);
+        } else {
+          checkedSteps[code].add(order);
+          const err = playbook.errors.find(e => e.st2_error_code === code);
+          const step = err && err.steps.find(s => s.order === order);
+          if (err && step) addStepToSession(err, step);
+        }
+        renderPrereqs();
+      });
+    });
+
+    // Wire branch checkpoint buttons inside prereq banner
+    banner.querySelectorAll('.branch-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.dataset.code;
+        const cp = btn.dataset.cp;
+        const choice = btn.dataset.choice;
+        if (!branchState[code]) branchState[code] = {};
+        branchState[code][`cp${cp}`] = choice;
+        if (cp === '1') { delete branchState[code].cp2; delete branchState[code].cp3; }
+        if (cp === '2') { delete branchState[code].cp3; }
+        const err = playbook.errors.find(e => e.st2_error_code === code);
+        if (err) renderPrereqs();
+      });
+    });
   }
 
   document.getElementById('session-device-copy').addEventListener('click', () => {
@@ -2202,6 +2008,105 @@
       }
     }).join('');
 
+    // Build error dropdown options filtered by current view
+    function errorDropdownHtml() {
+      if (!playbook) return '';
+      const errors = playbook.errors.filter(e => {
+        const views = e.views || ['errors'];
+        if (currentView === 'installation_service') return views.includes('installation_service');
+        return views.includes('errors');
+      });
+      const opts = errors.map(e => {
+        const label = e.variant ? `${e.app_error} — ${e.variant}` : (e.app_error ? `${e.app_error} — ${e.st2_error_code}` : e.st2_error_code);
+        return `<option value="${e.st2_error_code}" ${deviceState.selectedError === e.st2_error_code ? 'selected' : ''}>${label}</option>`;
+      }).join('');
+      return `
+        <div class="device-selector-row" style="margin-top:8px;">
+          <span class="device-selector-label">Issue</span>
+          <select class="device-select" id="dev-error">
+            <option value="">— Select issue —</option>
+            ${opts}
+          </select>
+        </div>`;
+    }
+
+    // Build inline troubleshooting block for the selected error
+    function inlineTroubleshootingHtml() {
+      if (!deviceState.selectedError || !playbook) return '';
+      const err = playbook.errors.find(e => e.st2_error_code === deviceState.selectedError);
+      if (!err) return '';
+
+      const checks = checkedSteps[err.st2_error_code] || new Set();
+
+      // Handle wifi_branch step specially
+      let stepsHtmlInner = '';
+      if (err.branching_flow) {
+        stepsHtmlInner = buildBranchingHtml(err);
+      } else {
+        const wifiStep = err.steps.find(s => s.wifi_branch);
+        const otherSteps = err.steps.filter(s => !s.wifi_branch);
+
+        let wifiHtml = '';
+        if (wifiStep) {
+          const ans = deviceState.wifiAnswer;
+          wifiHtml = `
+            <div class="wifi-branch-card">
+              <div class="wifi-branch-q">${wifiStep.order}. ${wifiStep.action}</div>
+              <div class="wifi-branch-btns">
+                <button class="wifi-btn yes ${ans === 'yes' ? 'active' : ''}" data-wifi="yes">Yes</button>
+                <button class="wifi-btn no ${ans === 'no' ? 'active' : ''}" data-wifi="no">No</button>
+              </div>
+              ${ans === 'yes' ? `<div class="wifi-note visible">${wifiStep.yes_note || ''}</div>` : ''}
+              ${ans === 'no'  ? `<div class="wifi-note visible">${wifiStep.no_note  || ''}</div>` : ''}
+            </div>`;
+        }
+
+        const stepsToShow = deviceState.wifiAnswer === 'yes'
+          ? otherSteps.filter(s => s.order >= 5)  // C2: skip to step 5; generic fallback
+          : otherSteps;
+
+        const stepsListHtml = stepsToShow.length > 0 ? `
+          <div class="steps-list" style="margin-top:8px;">
+            ${stepsToShow.map(s => {
+              const isDone = checks.has(s.order);
+              const isEscalate = s.action.toLowerCase().includes('escalate');
+              return `<div class="step-item ${isDone ? 'done' : ''} ${isEscalate ? 'escalate-step' : ''}">
+                <span class="step-num">${s.order}.</span>
+                <div class="step-content">
+                  <div class="step-action">${s.action}</div>
+                  ${s.detail ? `<div class="step-detail">${s.detail}</div>` : ''}
+                </div>
+                <div class="step-check ${isDone ? 'checked' : ''}" data-code="${err.st2_error_code}" data-order="${s.order}" title="Mark complete"></div>
+              </div>`;
+            }).join('')}
+          </div>` : '';
+
+        stepsHtmlInner = `<div class="branch-section">${wifiHtml}${stepsListHtml}</div>`;
+      }
+
+      // Notes
+      const notesHtmlInner = err.notes && err.notes.length > 0 ? `
+        <div class="section" style="margin-top:12px;">
+          <div class="section-title">Notes</div>
+          <div class="notes-list">
+            ${err.notes.map(n => `<div class="note-item ${n.type}"><span class="note-icon">${{diagnostic_hint:'🔍',version_specific:'⚠️',hardware_variant:'🔧',efficiency_tip:'💡'}[n.type]||'ℹ️'}</span><span>${n.text}</span></div>`).join('')}
+          </div>
+        </div>` : '';
+
+      return `
+        <div style="padding:14px 24px 0;">
+          <div class="prereq-banner-title" style="margin-bottom:8px;">
+            ${err.app_error ? `<span class="badge-app" style="margin-right:6px;">${err.app_error}</span>` : ''}
+            ${err.variant ? `<span class="badge-variant" style="margin-right:6px;">${err.variant}</span>` : ''}
+            ${(err.flags||[]).includes('fatal') ? `<span class="badge-fatal">Fatal</span>` : ''}
+            ${(err.flags||[]).includes('potentially_fatal') ? `<span class="badge-potentially-fatal">P. Fatal</span>` : ''}
+          </div>
+          <div style="font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:10px;">${err.meaning || ''}</div>
+          ${stepsHtmlInner}
+          ${notesHtmlInner}
+        </div>`;
+    }
+
     banner.innerHTML = `
       <div class="device-selector-section">
         <div class="device-selector-title">Device</div>
@@ -2217,10 +2122,12 @@
           </div>
           ${deviceModelRowHtml()}
           ${deviceZoneRowHtml()}
+          ${errorDropdownHtml()}
         </div>
       </div>
       <div class="prereq-banner-title" style="padding:14px 24px 0;">Before You Begin</div>
-      <div class="prereq-steps" style="padding:8px 24px 14px;">${stepsHtml}</div>
+      <div class="prereq-steps" style="padding:8px 24px 6px;">${stepsHtml}</div>
+      ${inlineTroubleshootingHtml()}
     `;
 
     // Wire firmware buttons
@@ -2290,32 +2197,6 @@
     return true;
   }
 
-  function filteredErrors() {
-    return playbook.errors.filter(err => {
-      if (!errBelongsToView(err)) return false;
-
-      const errFlags = err.flags || [];
-      const isEscalate = err.escalate;
-
-      let matchesFilter;
-      if (currentFilter === 'all') {
-        matchesFilter = true;
-      } else if (currentView === 'flags') {
-        if (currentFilter === 'escalate') matchesFilter = isEscalate;
-        else matchesFilter = errFlags.includes(currentFilter);
-      } else {
-        matchesFilter = err.app_error === currentFilter;
-      }
-
-      const searchStr = [err.app_error, err.st2_error_code, err.meaning, err.variant,
-        ...errFlags, isEscalate ? 'escalate' : '']
-        .filter(Boolean).join(' ').toLowerCase();
-      const matchesSearch = !currentSearch || searchStr.includes(currentSearch);
-
-      return matchesFilter && matchesSearch;
-    });
-  }
-
   function getFlagBadgesSm(err) {
     const flags = err.flags || [];
     const badges = [];
@@ -2326,46 +2207,6 @@
     if (err.escalate)
       badges.push('<span class="badge badge-escalate">Escalate</span>');
     return badges.join('');
-  }
-
-  function renderList() {
-    const list = document.getElementById('error-list');
-    const errors = filteredErrors();
-    document.getElementById('result-count').textContent = `${errors.length} result${errors.length !== 1 ? 's' : ''}`;
-
-    if (errors.length === 0) {
-      list.innerHTML = `<div class="no-results">No errors match your filters.</div>`;
-      return;
-    }
-
-    list.innerHTML = errors.map((err, i) => {
-      const globalIdx = playbook.errors.indexOf(err);
-      const isActive = globalIdx === activeIndex;
-      const checkedCount = checkedSteps[err.st2_error_code]?.size || 0;
-      const totalSteps = err.steps.length;
-      const progressDot = checkedCount > 0 && checkedCount < totalSteps
-        ? `<span style="font-family:var(--mono);font-size:9px;color:var(--warn);margin-left:4px;">${checkedCount}/${totalSteps}</span>`
-        : checkedCount > 0 && checkedCount === totalSteps
-        ? `<span style="font-family:var(--mono);font-size:9px;color:var(--green);margin-left:4px;">✓</span>`
-        : '';
-
-      return `
-        <div class="error-item ${isActive ? 'active' : ''}" data-idx="${globalIdx}">
-          <div class="error-item-top">
-            <span class="app-error-label">${err.app_error || '<span style="color:var(--text-muted)">—</span>'}${progressDot}</span>
-            ${err.escalate ? `<span class="badge badge-escalate">Escalate</span>` : ''}
-          </div>
-          <div class="st2-code">${err.st2_error_code}</div>
-        </div>`;
-    }).join('');
-
-    list.querySelectorAll('.error-item').forEach(el => {
-      el.addEventListener('click', () => {
-        activeIndex = parseInt(el.dataset.idx);
-        renderList();
-        renderDetail(playbook.errors[activeIndex]);
-      });
-    });
   }
 
   // ── DETAIL ──
@@ -2504,7 +2345,7 @@
         <div class="empty-state">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <h3>Select an error to begin</h3>
-          <p>Choose an error from the sidebar to view troubleshooting steps.</p>
+          <p>Select a device type and issue above to begin troubleshooting.</p>
         </div>`;
       return;
     }
@@ -2668,8 +2509,7 @@
           const step = err.steps.find(s => s.order === order);
           if (step) addStepToSession(err, step);
         }
-        renderDetail(err);
-        renderList(); // update progress indicators in sidebar
+        renderDetail(err); // update progress indicators in sidebar
       });
     });
 
@@ -2684,7 +2524,6 @@
         }
         checkedSteps[code] = new Set();
         renderDetail(err);
-        renderList();
       });
     });
   }
