@@ -1189,6 +1189,96 @@
   }
   .wifi-note.visible { display: block; }
 
+
+  /* ── RESOLUTION PANEL ── */
+  .resolution-panel {
+    border-top: 1px solid var(--border);
+    padding: 12px 14px;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .resolution-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .resolution-q {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 7px;
+    line-height: 1.4;
+  }
+
+  .resolution-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .resolution-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-bright);
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-muted);
+  }
+  .resolution-btn.yes.active {
+    background: var(--green-dim);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .resolution-btn.no.active {
+    background: var(--danger-dim);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .resolution-btn.warranty.active {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .resolution-btn.no-warranty.active {
+    background: var(--warn-dim);
+    border-color: var(--warn);
+    color: var(--warn);
+  }
+
+  .resolution-outcome {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.45;
+    display: none;
+  }
+  .resolution-outcome.visible { display: block; }
+  .resolution-outcome.resolved {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,0.25);
+  }
+  .resolution-outcome.warranty {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(59,130,246,0.25);
+  }
+  .resolution-outcome.no-warranty {
+    background: var(--warn-dim);
+    color: var(--warn);
+    border: 1px solid rgba(245,158,11,0.25);
+  }
+
   /* ── LIGHT MODE ── */
   body.light {
     --bg: #f4f6f9;
@@ -1340,6 +1430,30 @@
           <p>Completed steps will appear here as you work through an interaction.</p>
         </div>
       </div>
+      <div class="resolution-panel" id="resolution-panel">
+        <div class="resolution-title">Resolution</div>
+        <div class="resolution-q">Is the issue resolved?</div>
+        <div class="resolution-btns">
+          <button class="resolution-btn yes" id="res-yes">✓ Yes</button>
+          <button class="resolution-btn no" id="res-no">✗ No</button>
+        </div>
+        <div class="resolution-outcome resolved" id="res-outcome-resolved">
+          Issue resolved. Great work!
+        </div>
+        <div id="res-warranty-wrap" style="display:none;">
+          <div class="resolution-q" style="margin-top:10px;">Is the device covered under warranty?<br><span style="font-size:10px;opacity:0.6;">Standard warranty: 2 years from first heartbeat</span></div>
+          <div class="resolution-btns">
+            <button class="resolution-btn warranty" id="res-warranty-yes">Yes — under warranty</button>
+            <button class="resolution-btn no-warranty" id="res-warranty-no">No — out of warranty</button>
+          </div>
+          <div class="resolution-outcome warranty" id="res-outcome-warranty">
+            Replace device under warranty.
+          </div>
+          <div class="resolution-outcome no-warranty" id="res-outcome-no-warranty">
+            Next step: have the customer purchase a replacement.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1400,6 +1514,71 @@
     body.classList.toggle('light');
     localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
   });
+
+  // ── SCHEMATIC OVERLAY — wired once globally ──
+  (function() {
+    const overlay = document.getElementById('schematic-overlay');
+    const closeBtn = document.getElementById('schematic-overlay-close');
+    const closeOverlay = () => overlay.classList.remove('open');
+    closeBtn.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+  })();
+
+  // ── RESOLUTION PANEL ──
+  (function() {
+    const resYes = document.getElementById('res-yes');
+    const resNo = document.getElementById('res-no');
+    const outcomeResolved = document.getElementById('res-outcome-resolved');
+    const warrantyWrap = document.getElementById('res-warranty-wrap');
+    const resWarrantyYes = document.getElementById('res-warranty-yes');
+    const resWarrantyNo = document.getElementById('res-warranty-no');
+    const outcomeWarranty = document.getElementById('res-outcome-warranty');
+    const outcomeNoWarranty = document.getElementById('res-outcome-no-warranty');
+
+    function resetResolution() {
+      resYes.classList.remove('active');
+      resNo.classList.remove('active');
+      resWarrantyYes.classList.remove('active');
+      resWarrantyNo.classList.remove('active');
+      outcomeResolved.classList.remove('visible');
+      warrantyWrap.style.display = 'none';
+      outcomeWarranty.classList.remove('visible');
+      outcomeNoWarranty.classList.remove('visible');
+      warrantyMode = false;
+      renderTicketHeader();
+    }
+
+    resYes.addEventListener('click', () => {
+      resetResolution();
+      resYes.classList.add('active');
+      outcomeResolved.classList.add('visible');
+    });
+
+    resNo.addEventListener('click', () => {
+      resetResolution();
+      resNo.classList.add('active');
+      warrantyWrap.style.display = 'block';
+    });
+
+    resWarrantyYes.addEventListener('click', () => {
+      resWarrantyYes.classList.add('active');
+      resWarrantyNo.classList.remove('active');
+      outcomeWarranty.classList.add('visible');
+      outcomeNoWarranty.classList.remove('visible');
+      warrantyMode = true;
+      renderTicketHeader();
+    });
+
+    resWarrantyNo.addEventListener('click', () => {
+      resWarrantyNo.classList.add('active');
+      resWarrantyYes.classList.remove('active');
+      outcomeNoWarranty.classList.add('visible');
+      outcomeWarranty.classList.remove('visible');
+      warrantyMode = false;
+      renderTicketHeader();
+    });
+  })();
 
   // ── FEEDBACK ──
   const FORMSPREE_URL = 'https://formspree.io/f/mzdqlyre';
@@ -1642,6 +1821,16 @@
     firmwareVersions = { from: '', to: '' };
     firmwareNoteLogged = false;
     deviceState = { type: '', model: '', zone: '', controllerNumber: '', selectedError: '', wifiAnswer: '' };
+    warrantyMode = false;
+    // Reset resolution UI
+    document.getElementById('res-yes').classList.remove('active');
+    document.getElementById('res-no').classList.remove('active');
+    document.getElementById('res-warranty-wrap').style.display = 'none';
+    document.getElementById('res-outcome-resolved').classList.remove('visible');
+    document.getElementById('res-outcome-warranty').classList.remove('visible');
+    document.getElementById('res-outcome-no-warranty').classList.remove('visible');
+    document.getElementById('res-warranty-yes').classList.remove('active');
+    document.getElementById('res-warranty-no').classList.remove('active');
     renderSessionLog();
     renderTicketHeader();
     renderPrereqs();
@@ -1777,33 +1966,33 @@
     const activeErr = (activeIndex !== null && playbook) ? playbook.errors[activeIndex] : null;
     const errorLabel = activeErr ? (activeErr.app_error || '') : '';
     const variant = activeErr ? (activeErr.variant || '') : '';
-    // If there's a variant, prefer "Variant ErrorCategory" over just "ErrorCategory"
     const fullErrorLabel = (variant && errorLabel)
       ? `${variant} ${errorLabel}`
       : errorLabel;
+    const warrantyPrefix = warrantyMode ? 'Warranty ' : '';
 
     if (type === 'controller') {
       // e.g. "C2 Offline 001234" or "C3 Offline 001234"
       const numStr = deviceState.controllerNumber ? ` ${deviceState.controllerNumber}` : '';
       // For controller offline errors use compact format, otherwise generic
       if (errorLabel === 'Controller Offline') {
-        return `${model} offline${numStr}`;
+        return `${warrantyPrefix}${model} offline${numStr}`;
       }
       const modelLabel = model === 'C2' ? 'Controller 2' : model === 'C3' ? 'Controller 3' : model;
-      return `${modelLabel}${errorLabel ? ' ' + errorLabel : ''}${numStr}`;
+      return `${warrantyPrefix}${modelLabel}${errorLabel ? ' ' + errorLabel : ''}${numStr}`;
     }
 
     if (type === 'sprinkler') {
       // e.g. "S3.12 Z4 Timeout Error"
       const zoneStr = zone ? ` Z${zone}` : '';
-      return `S${model}${zoneStr}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
+      return `${warrantyPrefix}S${model}${zoneStr}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
     }
 
     if (type === 'valve') {
       // e.g. "Smart Valve 2 Pressure Error"
       const typeLabel = model === 'smart' ? 'Smart Valve' : 'Traditional Valve';
       const posStr = zone ? ` ${zone}` : '';
-      return `${typeLabel}${posStr}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
+      return `${warrantyPrefix}${typeLabel}${posStr}${fullErrorLabel ? ' ' + fullErrorLabel : ''}`;
     }
 
     return '';
@@ -1886,10 +2075,8 @@
     // Wire inline schematic fullscreen
     document.getElementById('prereq-banner').querySelectorAll('[id^="schematic-img-inline-"]').forEach(img => {
       img.addEventListener('click', () => {
-        const overlay = document.getElementById('schematic-overlay');
-        const overlayImg = document.getElementById('schematic-overlay-img');
-        overlayImg.src = img.src;
-        overlay.classList.add('open');
+        document.getElementById('schematic-overlay-img').src = img.src;
+        document.getElementById('schematic-overlay').classList.add('open');
       });
     });
 
@@ -2123,6 +2310,26 @@
         stepsHtmlInner = `<div class="branch-section">${wifiHtml}${stepsListHtml}</div>`;
       }
 
+      // Videos
+      const videosHtmlInner = (err.videos && err.videos.length > 0) ? `
+        <div class="section video-section" style="margin-top:12px;">
+          <div class="section-title">Reference Videos</div>
+          <div class="video-player-wrap">
+            ${err.videos.map(v => {
+              const path = VIDEO_PATHS[v.filename] || v.filename;
+              return `<div class="video-card">
+                <div class="video-card-header">
+                  <span class="video-card-label">🎬 ${v.label}</span>
+                  <span class="video-card-filename">${v.filename}</span>
+                </div>
+                <video class="video-player-el" controls playsinline>
+                  <source src="${path}">
+                </video>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : '';
+
       // Notes
       const notesHtmlInner = err.notes && err.notes.length > 0 ? `
         <div class="section" style="margin-top:12px;">
@@ -2165,6 +2372,7 @@
           </div>
           <div style="font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:10px;">${err.meaning || ''}</div>
           ${stepsHtmlInner}
+          ${videosHtmlInner}
           ${notesHtmlInner}
           ${inlineSchematicHtml}
         </div>`;
@@ -2565,8 +2773,6 @@
           overlay.classList.add('open');
         });
       }
-      if (closeBtn) closeBtn.onclick = () => overlay.classList.remove('open');
-      if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
     }
 
     // Step checkboxes
