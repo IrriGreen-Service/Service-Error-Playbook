@@ -1546,7 +1546,9 @@
       outcomeWarranty.classList.remove('visible');
       outcomeNoWarranty.classList.remove('visible');
       warrantyMode = false;
+      delete sessionLog['__no_warranty__'];
       renderTicketHeader();
+      renderSessionLog();
     }
 
     resYes.addEventListener('click', () => {
@@ -1577,6 +1579,18 @@
       outcomeWarranty.classList.remove('visible');
       warrantyMode = false;
       renderTicketHeader();
+
+      // Add a note to the session log under the active error
+      const noteKey = '__no_warranty__';
+      const activeErr = (activeIndex !== null && playbook) ? playbook.errors[activeIndex] : null;
+      const label = activeErr
+        ? (activeErr.app_error ? `${activeErr.app_error}${activeErr.variant ? ' — ' + activeErr.variant : ''}` : activeErr.st2_error_code)
+        : 'Device';
+      sessionLog[noteKey] = {
+        appError: 'Outcome',
+        steps: [{ order: 0, action: `${label} — device needs to be replaced but is not covered under warranty` }]
+      };
+      renderSessionLog();
     });
   })();
 
@@ -1704,16 +1718,17 @@
     const hasFw = sessionHasFirmwareNote();
 
     // Error tags at top — exclude __firmware__ from tags, show its own pill
-    const errorCodes = covered.filter(c => c !== '__firmware__');
+    const errorCodes = covered.filter(c => c !== '__firmware__' && c !== '__no_warranty__');
     if (errorCodes.length === 0 && !hasFw) {
       errorsList.innerHTML = '<span class="session-empty-tag">No errors yet</span>';
     } else {
       const fwTag = hasFw ? `<span class="session-error-tag" style="background:var(--warn-dim);color:var(--warn);border-color:rgba(245,158,11,0.3);" title="Firmware updated">FW Updated</span>` : '';
+      const noWarrantyTag = hasNoWarranty ? `<span class="session-error-tag" style="background:var(--danger-dim);color:var(--danger);border-color:rgba(239,68,68,0.3);" title="Not covered under warranty">No Warranty</span>` : '';
       const errTags = errorCodes.map(code => {
         const label = sessionLog[code].appError || code;
         return `<span class="session-error-tag" title="${code}">${label}</span>`;
       }).join('');
-      errorsList.innerHTML = fwTag + errTags;
+      errorsList.innerHTML = fwTag + noWarrantyTag + errTags;
     }
 
     // Steps body
@@ -1727,20 +1742,26 @@
     }
 
     // Sort: firmware note first, then error codes
+    const hasNoWarranty = !!sessionLog['__no_warranty__'];
+
     const orderedCodes = [
       ...(hasFw ? ['__firmware__'] : []),
+      ...(hasNoWarranty ? ['__no_warranty__'] : []),
       ...errorCodes
     ];
 
     body.innerHTML = orderedCodes.map(code => {
       const entry = sessionLog[code];
+      const isNoWarranty = code === '__no_warranty__';
       const groupLabel = code === '__firmware__'
         ? 'Firmware'
+        : isNoWarranty
+        ? 'Outcome'
         : (entry.appError ? `${entry.appError} — ${code}` : code);
       const stepsHtml = entry.steps.map(s =>
         `<div class="session-step-entry">
-          <span class="session-step-num" style="${code === '__firmware__' ? 'color:var(--warn);' : ''}">→</span>
-          <span class="session-step-text" style="${code === '__firmware__' ? 'color:var(--warn);font-weight:500;' : ''}">${s.action}</span>
+          <span class="session-step-num" style="${code === '__firmware__' ? 'color:var(--warn);' : isNoWarranty ? 'color:var(--danger);' : ''}">→</span>
+          <span class="session-step-text" style="${code === '__firmware__' ? 'color:var(--warn);font-weight:500;' : isNoWarranty ? 'color:var(--danger);font-weight:500;' : ''}">${s.action}</span>
         </div>`
       ).join('');
       return `
@@ -1777,7 +1798,7 @@
     const lines = [];
     lines.push('=== Troubleshooting Session Log ===');
     lines.push('');
-    const errorCodes = covered.filter(c => c !== '__firmware__');
+    const errorCodes = covered.filter(c => c !== '__firmware__' && c !== '__no_warranty__');
     if (errorCodes.length > 0) {
       lines.push('Errors addressed: ' + errorCodes.map(c => sessionLog[c].appError || c).join(', '));
     }
