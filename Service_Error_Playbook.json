@@ -54,7 +54,10 @@
       "flags": [
         "potentially_fatal"
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": null,
@@ -179,7 +182,10 @@
       "flags": [
         "potentially_fatal"
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": "Current Error",
@@ -219,7 +225,10 @@
       "flags": [
         "potentially_fatal"
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": null,
@@ -611,7 +620,10 @@
         }
       ],
       "notes": [],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": "Pressure Error",
@@ -647,7 +659,10 @@
           "text": "Sprinkler versions older than 2.5 (1.52) do not have pressure sensors."
         }
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": null,
@@ -696,7 +711,10 @@
       "flags": [
         "fatal"
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": null,
@@ -1183,7 +1201,10 @@
         "errors",
         "installation_service"
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": null,
@@ -1197,7 +1218,10 @@
           "text": "This code indicates the job was manually cancelled by someone using the IrriGreen app \u2014 not a fault or hardware issue. No troubleshooting required unless cancellation was unintentional."
         }
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": "Autowater Issue",
@@ -1235,7 +1259,10 @@
         }
       ],
       "notes": [],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": "Not Receiving Notifications",
@@ -1259,7 +1286,10 @@
         }
       ],
       "notes": [],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": "S3 Service Kit Guide",
