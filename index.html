@@ -1569,7 +1569,10 @@
       outcomeWarranty.classList.add('visible');
       outcomeNoWarranty.classList.remove('visible');
       warrantyMode = true;
+      // Remove any existing no-warranty note
+      delete sessionLog['__no_warranty__'];
       renderTicketHeader();
+      renderSessionLog();
     });
 
     resWarrantyNo.addEventListener('click', () => {
@@ -1716,10 +1719,13 @@
     const body = document.getElementById('session-body');
     const covered = sessionErrorsCovered();
     const hasFw = sessionHasFirmwareNote();
+    const hasNoWarranty = !!sessionLog['__no_warranty__'];
 
-    // Error tags at top — exclude __firmware__ from tags, show its own pill
+    // Error tags at top — exclude special keys, show their own pills
     const errorCodes = covered.filter(c => c !== '__firmware__' && c !== '__no_warranty__');
-    if (errorCodes.length === 0 && !hasFw) {
+    const hasAnything = errorCodes.length > 0 || hasFw || hasNoWarranty;
+
+    if (!hasAnything) {
       errorsList.innerHTML = '<span class="session-empty-tag">No errors yet</span>';
     } else {
       const fwTag = hasFw ? `<span class="session-error-tag" style="background:var(--warn-dim);color:var(--warn);border-color:rgba(245,158,11,0.3);" title="Firmware updated">FW Updated</span>` : '';
@@ -1732,7 +1738,7 @@
     }
 
     // Steps body
-    if (covered.length === 0) {
+    if (!hasAnything) {
       body.innerHTML = `
         <div class="session-empty-state">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -1740,9 +1746,6 @@
         </div>`;
       return;
     }
-
-    // Sort: firmware note first, then error codes
-    const hasNoWarranty = !!sessionLog['__no_warranty__'];
 
     const orderedCodes = [
       ...(hasFw ? ['__firmware__'] : []),
