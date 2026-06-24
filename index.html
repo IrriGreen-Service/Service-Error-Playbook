@@ -2250,10 +2250,11 @@
         if (currentView === 'installation_service') return views.includes('installation_service');
         if (!views.includes('errors')) return false;
         // Filter by device_type if one is selected
+        // device_type can be a string or array of strings
         if (deviceState.type && e.device_type) {
-          return e.device_type === deviceState.type;
+          const types = Array.isArray(e.device_type) ? e.device_type : [e.device_type];
+          return types.includes(deviceState.type);
         }
-        // No device selected — show nothing until a type is picked
         if (deviceState.type && !e.device_type) return true; // untagged entries always show
         return false;
       });

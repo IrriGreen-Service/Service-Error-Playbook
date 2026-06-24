@@ -136,7 +136,10 @@
       "flags": [
         "potentially_fatal"
       ],
-      "device_type": "valve"
+      "device_type": [
+        "sprinkler",
+        "valve"
+      ]
     },
     {
       "app_error": "Current Error",
